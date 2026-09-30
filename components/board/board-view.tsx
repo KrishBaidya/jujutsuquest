@@ -6,21 +6,20 @@ import { useState } from "react";
 import { MapPin, QrCode, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GRADES, GRADE_ORDER, type GradeKey } from "@/lib/grades";
-import { CATEGORIES, me, quests, type CategoryKey } from "@/lib/mock-data";
+import { CATEGORIES, type CategoryKey } from "@/lib/categories";
+import type { QuestView, SiteView } from "@/lib/queries/quests";
 import { CePill, Chip, Kanji, PageHeader, SealedCard } from "@/components/app/primitives";
 import { Page } from "@/components/app/shell";
 import { Scroller } from "@/components/app/scroller";
 import { FORWARD } from "@/components/app/transitions";
-import { campusPlaces } from "@/lib/campus";
 import { BountyCard, QuestCard } from "./quest-card";
 
-const sites = campusPlaces.filter((p) => p.image);
+const GRADE_FILTERS = GRADE_ORDER.filter((g) => g !== "special");
 
-const open = quests.filter((q) => !q.sealedUntil);
-const bounty = open.find((q) => q.bounty);
-const regular = open.filter((q) => !q.bounty);
-
-export function BoardView() {
+export function BoardView({ quests: open, sites, ce }: { quests: QuestView[]; sites: SiteView[]; ce: number }) {
+  const bounty = open.find((q) => q.isBounty);
+  const regular = open.filter((q) => q !== bounty);
+  const qrQuest = open.find((q) => q.verification === "qr");
   const [category, setCategory] = useState<CategoryKey | "all">("all");
   const [grades, setGrades] = useState<Set<GradeKey>>(new Set());
 
@@ -46,7 +45,7 @@ export function BoardView() {
           <div className="flex flex-col gap-1.5">
             <Kanji className="brush text-5xl leading-none">命</Kanji>
             <h1 className="font-display text-[28px] font-extrabold">Mission board</h1>
-            <span className="text-[15px] text-mist-300">{open.length} missions near you</span>
+            <span className="text-[15px] text-mist-300">{open.length} missions open</span>
           </div>
           <div className="flex flex-col gap-1">
             <span className="mb-1.5 text-[13px] text-mist-500">Category</span>
@@ -64,7 +63,7 @@ export function BoardView() {
           </div>
           <div className="flex flex-col gap-1">
             <span className="mb-1.5 text-[13px] text-mist-500">Grade</span>
-            {GRADE_ORDER.map((g) => (
+            {GRADE_FILTERS.map((g) => (
               <label
                 key={g}
                 className="flex h-9 cursor-pointer items-center gap-2.5 px-3 text-[15px] text-mist-300 hover:text-mist-100"
@@ -88,8 +87,8 @@ export function BoardView() {
             <PageHeader
               kanji="命"
               title="Mission board"
-              subtitle={`${open.length} missions near you`}
-              right={<CePill value={me.ce} className="h-[34px]" />}
+              subtitle={`${open.length} missions open`}
+              right={<CePill value={ce} className="h-[34px]" />}
             />
             <Scroller label="Filter missions" arrows={false} className="py-4" trackClassName="gap-2 px-5">
               <span className="flex h-9 flex-none items-center gap-1.5 rounded-full border border-night-700 bg-night-800 px-3 text-[13px] text-mist-300">
@@ -126,25 +125,23 @@ export function BoardView() {
                       transitionTypes={FORWARD}
                       className="group relative h-[132px] w-[220px] overflow-hidden rounded border border-night-700 lg:h-[150px] lg:w-[264px]"
                     >
-                      <Image
-                        src={s.image!}
-                        alt=""
-                        fill
-                        sizes="264px"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
+                      {s.image && (
+                        <Image
+                          src={s.image}
+                          alt=""
+                          fill
+                          sizes="264px"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      )}
                       <span className="absolute inset-0 bg-gradient-to-t from-night-950 via-night-950/20 to-transparent" />
                       <span className="absolute inset-x-3 bottom-2.5 flex items-end justify-between gap-2">
                         <span className="font-display text-[17px] font-extrabold leading-tight">{s.name}</span>
                         <span className="flex flex-none items-center gap-1 text-[13px] text-mist-300">
                           <MapPin className="size-3.5" aria-hidden />
-                          {s.distance}
+                          {s.questCount} {s.questCount === 1 ? "quest" : "quests"}
                         </span>
                       </span>
-                      <span
-                        className="absolute left-2.5 top-2.5 size-2.5 rounded-full shadow-[0_0_0_2px_#0B0C0F]"
-                        style={{ background: GRADES[s.grade].color }}
-                      />
                     </Link>
                   ))}
                 </Scroller>
@@ -166,13 +163,15 @@ export function BoardView() {
         </div>
       </div>
 
-      <Link
-        href="/verify/club-fair?mode=qr"
-        aria-label="Scan a QR code"
-        className="fixed bottom-[104px] right-[max(20px,calc(50%-195px))] z-10 flex size-[58px] items-center justify-center rounded-full bg-cursed-500 text-night-950 shadow-[0_8px_24px_rgba(61,139,255,0.5)] lg:hidden"
-      >
-        <QrCode className="size-7" aria-hidden />
-      </Link>
+      {qrQuest && (
+        <Link
+          href={`/verify/${qrQuest.id}`}
+          aria-label="Scan a QR code"
+          className="fixed bottom-[104px] right-[max(20px,calc(50%-195px))] z-10 flex size-[58px] items-center justify-center rounded-full bg-cursed-500 text-night-950 shadow-[0_8px_24px_rgba(61,139,255,0.5)] lg:hidden"
+        >
+          <QrCode className="size-7" aria-hidden />
+        </Link>
+      )}
     </Page>
   );
 }

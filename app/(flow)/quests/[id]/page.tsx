@@ -1,25 +1,28 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Camera, ChevronLeft, Footprints, MapPin, Plus, QrCode, Share2 } from "lucide-react";
-import { questById, quests, categoryOf, me, type Quest } from "@/lib/mock-data";
-import { Action, GradePill, Kanji } from "@/components/app/primitives";
+import Image from "next/image";
+import { Camera, ChevronLeft, MapPin, QrCode, Share2 } from "lucide-react";
+import { categoryOf } from "@/lib/categories";
+import { getQuest, type QuestView } from "@/lib/queries/quests";
+import { requireUser } from "@/lib/session";
+import { GradePill, Kanji } from "@/components/app/primitives";
 import { Page } from "@/components/app/shell";
 import { BACK, Morph } from "@/components/app/transitions";
+import { AcceptButton } from "@/components/board/accept-button";
+import { Countdown } from "@/components/board/countdown";
 
 const VERIFY = {
   photo: { Icon: Camera, note: "Camera only. Gallery uploads aren't accepted." },
-  qr: { Icon: QrCode, note: "Scan the code printed on the notice board." },
-  walk: { Icon: Footprints, note: "Keep the app open. Distance is tracked on-device." },
+  qr: { Icon: QrCode, note: "Scan the code printed at the site." },
 } as const;
 
-export function generateStaticParams() {
-  return quests.filter((q) => !q.sealedUntil).map((q) => ({ id: q.id }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function QuestDetailPage({ params }: PageProps<"/quests/[id]">) {
   const { id } = await params;
-  const quest = questById(id);
-  if (!quest || quest.sealedUntil) notFound();
+  const user = await requireUser();
+  const quest = await getQuest(id, user.id);
+  if (!quest) notFound();
 
   const cat = categoryOf(quest.category);
 
@@ -30,9 +33,12 @@ export default async function QuestDetailPage({ params }: PageProps<"/quests/[id
         <article className="flex flex-1 flex-col">
           <div className="rod-lg mx-1.5 mt-[calc(env(safe-area-inset-top)+16px)] flex-none lg:mx-0 lg:mt-0" />
           <div className="paper mx-3 flex-1 lg:mx-2">
-            <div className="placeholder-photo relative m-3 flex h-44 items-end rounded p-2.5 lg:m-5 lg:h-[300px]">
-              <span className="bg-washi-100 px-1.5 py-0.5 font-mono text-[13px] text-sumi-600">
-                scouting photo · {quest.location}
+            <div className="placeholder-photo relative m-3 flex h-44 items-end overflow-hidden rounded p-2.5 lg:m-5 lg:h-[300px]">
+              {quest.locationImage && (
+                <Image src={quest.locationImage} alt="" fill sizes="(min-width: 1024px) 700px, 430px" className="object-cover" />
+              )}
+              <span className="relative bg-washi-100 px-1.5 py-0.5 font-mono text-[13px] text-sumi-600">
+                {quest.locationName}
               </span>
               <Link
                 href="/board"
@@ -70,7 +76,6 @@ export default async function QuestDetailPage({ params }: PageProps<"/quests/[id
               </p>
               <div className="ink-divider" />
               <HowToVerify quest={quest} />
-              {quest.squad && <Squad note={quest.squad} className="lg:hidden" />}
             </div>
           </div>
           <div className="rod-lg mx-1.5 hidden lg:mx-0 lg:block" />
@@ -81,14 +86,7 @@ export default async function QuestDetailPage({ params }: PageProps<"/quests/[id
           <div className="paper rounded px-4 py-1">
             <Facts quest={quest} stacked />
           </div>
-          {quest.squad && <Squad note={quest.squad} />}
-          {quest.squad && (
-            <div className="flex items-center justify-between text-[13px]">
-              <span className="text-mist-300">Squad 1 of 2</span>
-              <span className="font-bold text-cursed-300">Invite pending</span>
-            </div>
-          )}
-          <Action href="/missions">Accept mission</Action>
+          <AcceptButton questId={quest.id} status={quest.missionStatus} />
           <Link
             href="/board"
             transitionTypes={BACK}
@@ -101,21 +99,13 @@ export default async function QuestDetailPage({ params }: PageProps<"/quests/[id
 
       {/* mobile action bar */}
       <div className="fixed inset-x-0 bottom-0 z-10 mx-auto flex w-full max-w-[430px] items-center gap-3 border-t border-night-700 bg-night-800 px-5 pb-[30px] pt-3.5 lg:hidden">
-        {quest.squad && (
-          <div className="flex flex-none flex-col">
-            <span className="text-[13px] text-mist-300">Squad 1 of 2</span>
-            <span className="text-[13px] font-bold text-cursed-300">Invite pending</span>
-          </div>
-        )}
-        <Action href="/missions" className="h-[54px] flex-1">
-          Accept mission
-        </Action>
+        <AcceptButton questId={quest.id} status={quest.missionStatus} className="h-[54px] flex-1" />
       </div>
     </Page>
   );
 }
 
-function Facts({ quest, stacked, className }: { quest: Quest; stacked?: boolean; className?: string }) {
+function Facts({ quest, stacked, className }: { quest: QuestView; stacked?: boolean; className?: string }) {
   const cell = stacked
     ? "flex items-baseline justify-between border-b border-washi-300 py-3 last:border-b-0"
     : "flex flex-col border-l border-washi-300 pl-3 first:border-l-0 first:pl-0";
@@ -133,17 +123,19 @@ function Facts({ quest, stacked, className }: { quest: Quest; stacked?: boolean;
       </div>
       <div className={cell}>
         <dt className="text-[13px] text-sumi-600">Open until</dt>
-        <dd className="text-[15px] font-bold">{quest.until}</dd>
+        <dd className="text-[15px] font-bold">
+          {quest.expiresAt ? <Countdown expiresAt={quest.expiresAt} /> : "No deadline"}
+        </dd>
       </div>
       <div className={cell}>
-        <dt className="text-[13px] text-sumi-600">Distance</dt>
-        <dd className="text-[15px] font-bold">{quest.distance}</dd>
+        <dt className="text-[13px] text-sumi-600">Verify by</dt>
+        <dd className="text-[15px] font-bold">{quest.verification === "qr" ? "QR scan" : "Live photo"}</dd>
       </div>
     </dl>
   );
 }
 
-function HowToVerify({ quest }: { quest: Quest }) {
+function HowToVerify({ quest }: { quest: QuestView }) {
   const v = VERIFY[quest.verification];
   return (
     <div className="flex items-center gap-3 text-sumi-900">
@@ -157,25 +149,6 @@ function HowToVerify({ quest }: { quest: Quest }) {
         </span>
         <span className="text-[15px] font-bold leading-[1.4]">{quest.verifyHint}</span>
         <span className="text-[13px] text-sumi-600">{v.note}</span>
-      </div>
-    </div>
-  );
-}
-
-function Squad({ note, className }: { note: string; className?: string }) {
-  return (
-    <div className={"flex items-center gap-3 rounded bg-washi-300 p-3 text-sumi-900 " + (className ?? "")}>
-      <div className="flex">
-        <span className="flex size-8 items-center justify-center rounded-full bg-sumi-600 text-[13px] font-bold text-washi-100 shadow-[0_0_0_2px_#DDD5C3]">
-          {me.initials}
-        </span>
-        <span className="-ml-2 flex size-8 items-center justify-center rounded-full border-[1.5px] border-dashed border-sumi-600 bg-washi-300">
-          <Plus className="size-4" aria-hidden />
-        </span>
-      </div>
-      <div className="flex flex-col">
-        <span className="text-[13px] font-bold">Squad needed</span>
-        <span className="text-[13px] text-sumi-600">{note}</span>
       </div>
     </div>
   );
