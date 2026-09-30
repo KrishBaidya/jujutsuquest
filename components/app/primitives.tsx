@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { GRADES, type GradeKey } from "@/lib/grades";
-import { categoryOf, type CategoryKey } from "@/lib/mock-data";
+import { categoryOf, type CategoryKey } from "@/lib/categories";
 import { CountUp } from "./count-up";
 
 /** Small coloured dot + label, on paper or on night. */
