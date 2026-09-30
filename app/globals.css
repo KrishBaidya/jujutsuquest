@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./ink.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -126,5 +127,69 @@
   }
   html {
     @apply font-sans;
+  }
+}
+/* Cursed Mission Board — Ink and Talisman tokens */
+@theme {
+  --color-night-950: #0c0919;
+  --color-night-900: #110d22;
+  --color-night-800: #1a1531;
+  --color-night-700: #262046;
+  --color-night-600: #3a3264;
+  --color-line: #1f1a3b;
+  --color-mist-100: #eee8fa;
+  --color-mist-300: #a69fc2;
+  --color-mist-500: #6e6790;
+  --color-washi-100: #f2e6cb;
+  --color-washi-300: #e0cfa6;
+  --color-washi-500: #d6c49b;
+  --color-sumi-900: #2b2117;
+  --color-sumi-600: #6e5c44;
+  --color-wood-700: #5b3a22;
+  --color-cursed-500: #7a5cff;
+  --color-cursed-300: #b9a6ff;
+  --color-azure-500: #4c9bff;
+  --color-seal-600: #c22e26;
+  --color-flash-500: #e0202a;
+  --color-ember-500: #ff7a2f;
+  --color-gold-400: #d9a441;
+  --color-jade-500: #2fb38a;
+  --color-grade-4: #6cb4ff;
+  --color-grade-3: #5b8cff;
+  --color-grade-2: #7a5cff;
+  --color-grade-semi-1: #a64de0;
+  --color-grade-1: #d6409f;
+  --color-grade-special: #e0202a;
+
+  --font-display: var(--font-shippori), serif;
+  --font-body: var(--font-zen), sans-serif;
+
+  --ease-ink: cubic-bezier(0.22, 0.9, 0.24, 1);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-night-950);
+    color: var(--color-mist-100);
+    font-family: var(--font-body);
+  }
+}
+
+@layer utilities {
+  .bg-grid-night {
+    background-color: var(--color-night-900);
+    background-image:
+      linear-gradient(rgba(238, 232, 250, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(238, 232, 250, 0.025) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .paper {
+    background-color: var(--color-washi-100);
+    background-image: radial-gradient(rgba(110, 92, 68, 0.07) 1px, transparent 1.2px);
+    background-size: 4px 4px;
+    color: var(--color-sumi-900);
+  }
+  .brush {
+    filter: url(#brush);
   }
 }
