@@ -1,117 +1,101 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Camera, CheckCircle2, Flame, MapPin, Pin, QrCode } from "lucide-react";
+import { Camera, MapPin, QrCode, Timer } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { GRADES } from "@/lib/grades";
+import { categoryOf } from "@/lib/categories";
 import type { QuestView } from "@/lib/queries/quests";
-import { CategoryTag, GradePill, ScrollCard } from "@/components/app/primitives";
-import { FORWARD, Morph } from "@/components/app/transitions";
+import type { MissionStatus } from "@/lib/db/schema";
+import { Ce } from "@/components/ui";
 import { Countdown } from "./countdown";
 
-const VERIFY_ICON = { photo: Camera, qr: QrCode } as const;
-const VERIFY_LABEL = { photo: "Live photo", qr: "QR scan" } as const;
+/** `tone` is for dark surfaces, `paper` for talisman paper. */
+export const STATUS_STAMP: Record<MissionStatus, { kanji: string; label: string; tone: string; paper: string }> = {
+  accepted: { kanji: "誓", label: "Vowed", tone: "text-cursed-soft border-cursed-soft", paper: "text-cursed border-cursed" },
+  in_review: { kanji: "審", label: "Under review", tone: "text-gold border-gold", paper: "text-[#9a6a12] border-[#9a6a12]" },
+  completed: { kanji: "祓", label: "Exorcised", tone: "text-blood border-blood", paper: "text-blood border-blood" },
+  rejected: { kanji: "破", label: "Failed", tone: "text-fg-muted border-fg-muted", paper: "text-paper-muted border-paper-muted" },
+};
 
-const STATUS_LABEL = { accepted: "Accepted", in_review: "In review", completed: "Completed" } as const;
-
-function StatusTag({ status }: { status: QuestView["missionStatus"] }) {
-  if (status !== "accepted" && status !== "in_review" && status !== "completed") return null;
-  return (
-    <span className="flex items-center gap-1 text-[13px] font-bold text-sumi-900">
-      <CheckCircle2 className="size-3.5" aria-hidden />
-      {STATUS_LABEL[status]}
-    </span>
-  );
-}
-
-export function QuestCard({ quest, focus, index = 0 }: { quest: QuestView; focus?: boolean; index?: number }) {
+/** A mission as a horizontal talisman: grade strip, title, place, reward. */
+export function QuestCard({ quest, index = 0 }: { quest: QuestView; index?: number }) {
   const g = GRADES[quest.grade];
-  const Icon = VERIFY_ICON[quest.verification];
+  const cat = categoryOf(quest.category);
+  const stamp = quest.missionStatus ? STATUS_STAMP[quest.missionStatus] : null;
   return (
     <Link
       href={`/quests/${quest.id}`}
-      transitionTypes={FORWARD}
-      className="block outline-none transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1"
+      className="panel rise group flex min-h-[148px] overflow-hidden transition-transform hover:-translate-y-0.5"
+      style={{ ["--i" as string]: index }}
     >
-      <ScrollCard glow={`${g.glow},${focus ? 0.6 : 0.22}`} blur={focus ? 20 : 10} pulse={focus} index={index} bodyClassName="min-h-[132px] gap-2.5 lg:min-h-[164px] lg:p-4">
-        <div className="flex items-center justify-between">
-          <GradePill grade={quest.grade} />
-          <CategoryTag category={quest.category} />
-        </div>
-        <Morph name={`quest-title-${quest.id}`}>
-          <h3 className="font-display text-xl font-extrabold leading-[1.3] text-sumi-900 lg:text-[19px]">
-            {quest.title}
-          </h3>
-        </Morph>
-        <div className="mt-auto flex items-end justify-between">
-          <div className="flex flex-col gap-0.5 text-[13px] text-sumi-600">
-            <span className="flex items-center gap-1">
-              <MapPin className="size-3.5" aria-hidden />
-              {quest.locationName}
-            </span>
-            <span className="flex items-center gap-1 lg:hidden">
-              <Icon className="size-3.5" aria-hidden />
-              {VERIFY_LABEL[quest.verification]}
-            </span>
-            <StatusTag status={quest.missionStatus} />
-          </div>
-          <span className="font-display text-2xl font-extrabold text-seal-600 lg:text-[22px]">
-            +{quest.ce} <span className="text-sm">CE</span>
-          </span>
-        </div>
-      </ScrollCard>
-    </Link>
-  );
-}
+      {/* Grade strip */}
+      <div
+        className="relative flex w-12 flex-none flex-col items-center justify-between py-3"
+        style={{ background: `linear-gradient(180deg, rgb(${g.glow} / 0.28), rgb(${g.glow} / 0.06))` }}
+      >
+        <span className="absolute inset-y-0 left-0 w-[3px]" style={{ background: g.color, boxShadow: `0 0 12px ${g.color}` }} />
+        <span className="kanji text-[20px] [writing-mode:vertical-rl]" style={{ color: g.color }}>
+          {g.kanji}
+        </span>
+        <span className="font-mono text-[10px] text-fg-faint">{g.short}</span>
+      </div>
 
-export function BountyCard({ quest }: { quest: QuestView }) {
-  const g = GRADES[quest.grade];
-  return (
-    <Link href={`/quests/${quest.id}`} transitionTypes={FORWARD} className="relative block">
-      <span className="ember absolute -top-2.5 left-[30%] size-1 rounded-full bg-ember-500" />
-      <span className="ember absolute -top-[18px] left-[62%] size-[3px] rounded-full bg-[#F7B488]" style={{ "--i": 1 } as React.CSSProperties} />
-      <span className="ember absolute -top-1.5 right-[12%] size-[3px] rounded-full bg-ember-500" style={{ "--i": 2 } as React.CSSProperties} />
-      <ScrollCard glow="240,129,58,0.4" blur={14} burning bodyClassName="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-6 lg:p-5">
-        <div className="placeholder-photo relative hidden h-[150px] items-end overflow-hidden rounded p-2 lg:flex">
-          {quest.locationImage ? (
-            <Image src={quest.locationImage} alt="" fill sizes="260px" className="object-cover" />
-          ) : (
-            <span className="font-mono text-[13px] text-sumi-600">{quest.locationName}</span>
+      {/* Body */}
+      <div className="relative flex min-w-0 flex-1 flex-col gap-2 p-4">
+        {quest.locationImage && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 right-0 w-1/2 bg-cover bg-center opacity-[0.16] grayscale transition-opacity duration-500 [mask-image:linear-gradient(90deg,transparent,black)] group-hover:opacity-30"
+            style={{ backgroundImage: `url(${quest.locationImage})` }}
+          />
+        )}
+        <div className="relative flex items-center gap-2 text-[12px] text-fg-muted">
+          <span className="kanji text-[15px] text-fg">{cat.k}</span>
+          <span className="font-bold uppercase tracking-wider">{cat.label}</span>
+          {quest.isBounty && (
+            <span className="ml-1 bg-blood px-1.5 py-px font-mono text-[10px] font-semibold tracking-widest text-bone">
+              BOUNTY
+            </span>
           )}
         </div>
-        <div className="flex flex-col gap-2 lg:gap-2.5">
-          <div className="flex items-center justify-between">
-            <span className="flex items-center gap-1.5 text-[13px] font-bold">
-              <Pin className="size-4" aria-hidden />
-              Daily bounty
+        <h3 className="relative font-display text-[18px] leading-[1.2] tracking-tight group-hover:text-bone">
+          {quest.title}
+        </h3>
+        <p className="relative flex items-center gap-1.5 text-[13px] text-fg-muted">
+          <MapPin className="size-3.5 text-blood" aria-hidden />
+          {quest.locationName}
+        </p>
+        <div className="relative mt-auto flex items-end justify-between gap-3 pt-1">
+          <div className="flex items-center gap-3 text-[12px] text-fg-faint">
+            <span className="flex items-center gap-1">
+              {quest.verification === "qr" ? (
+                <QrCode className="size-3.5" aria-hidden />
+              ) : (
+                <Camera className="size-3.5" aria-hidden />
+              )}
+              {quest.verification === "qr" ? "Seal scan" : "Photo"}
             </span>
             {quest.expiresAt && (
-              <span className="flex h-6 items-center gap-1 rounded-full bg-sumi-900 px-2.5 text-[13px] font-bold text-ember-500">
-                <Flame className="size-3.5" aria-hidden />
-                <Countdown expiresAt={quest.expiresAt} />
+              <span className="flex items-center gap-1 text-blood-bright">
+                <Timer className="size-3.5" aria-hidden />
+                <Countdown to={quest.expiresAt} />
               </span>
             )}
           </div>
-          <Morph name={`quest-title-${quest.id}`}>
-            <h3 className="font-display text-xl font-extrabold leading-[1.3] text-sumi-900 lg:text-[28px] lg:leading-tight">
-              {quest.title}
-            </h3>
-          </Morph>
-          <p className="hidden text-[15px] leading-[1.6] text-sumi-600 lg:block">{quest.description}</p>
-          <div className="mt-auto flex items-end justify-between">
-            <div className="flex flex-col gap-1.5 text-[13px] text-sumi-600 lg:flex-row lg:items-center lg:gap-3.5">
-              <GradePill grade={quest.grade} />
-              <span className="flex items-center gap-1">
-                <MapPin className="size-3.5" aria-hidden />
-                {quest.locationName}
-              </span>
-              <StatusTag status={quest.missionStatus} />
-            </div>
-            <span className="font-display text-2xl font-extrabold text-seal-600 lg:text-[28px]">
-              +{quest.ce} <span className="text-sm">CE</span>
-            </span>
-          </div>
+          <Ce value={quest.ce} sign className="text-[22px] leading-none text-bone" />
         </div>
-      </ScrollCard>
-      <span className="sr-only">Grade {g.label}</span>
+      </div>
+
+      {stamp && (
+        <span
+          className={cn(
+            "stamp-in absolute right-3 top-3 flex items-center gap-1 border-2 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wider",
+            stamp.tone,
+          )}
+        >
+          <span className="kanji text-[14px]">{stamp.kanji}</span>
+          {stamp.label}
+        </span>
+      )}
     </Link>
   );
 }

@@ -13,7 +13,7 @@ export const SESSION_COOKIE = "cmb_session";
 const MAX_AGE = 60 * 60 * 24 * 30;
 
 /** Seeded student used when no cookie is present outside production. */
-export const DEV_FALLBACK_UID = "DEMO-0019";
+export const DEV_FALLBACK_UID = "23BCS10019";
 
 function secret() {
   const s = process.env.SESSION_SECRET;

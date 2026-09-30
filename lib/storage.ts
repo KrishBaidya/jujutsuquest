@@ -35,8 +35,12 @@ export async function uploadPhoto(
   return key;
 }
 
-/** A URL the browser can load for the next `expiresIn` seconds. */
-export function photoUrl(key: string, expiresIn = 3600): Promise<string> {
+/**
+ * A URL the browser can load for the next `expiresIn` seconds. Keys that are
+ * already paths (seeded sample photos under /public) are returned as they are.
+ */
+export async function photoUrl(key: string, expiresIn = 3600): Promise<string> {
+  if (key.startsWith("/")) return key;
   return getSignedUrl(s3(), new GetObjectCommand({ Bucket: BUCKET, Key: key }), { expiresIn });
 }
 

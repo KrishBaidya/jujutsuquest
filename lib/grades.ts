@@ -2,14 +2,14 @@ export type GradeKey = "g4" | "g3" | "g2" | "semi1" | "g1" | "special";
 
 export const GRADES: Record<
   GradeKey,
-  { label: string; color: string; glow: string; feel: string }
+  { label: string; short: string; kanji: string; color: string; /** "r g b" for rgb(var / a) */ glow: string; feel: string }
 > = {
-  g4: { label: "Grade 4", color: "#8FA3B8", glow: "143,163,184", feel: "Faint wisp" },
-  g3: { label: "Grade 3", color: "#4FA3FF", glow: "79,163,255", feel: "Steady blue" },
-  g2: { label: "Grade 2", color: "#3D6BFF", glow: "61,107,255", feel: "Deep cobalt" },
-  semi1: { label: "Semi-Grade 1", color: "#8A5BFF", glow: "138,91,255", feel: "Rising storm" },
-  g1: { label: "Grade 1", color: "#E0508A", glow: "224,80,138", feel: "Burning rose" },
-  special: { label: "Special Grade", color: "#D8392B", glow: "216,57,43", feel: "Red flash" },
+  g4: { label: "Grade 4", short: "G4", kanji: "四級", color: "#8C8792", glow: "140 135 146", feel: "Faint residue" },
+  g3: { label: "Grade 3", short: "G3", kanji: "三級", color: "#5F95C9", glow: "95 149 201", feel: "Steady flow" },
+  g2: { label: "Grade 2", short: "G2", kanji: "二級", color: "#5A63E6", glow: "90 99 230", feel: "Deep current" },
+  semi1: { label: "Semi-Grade 1", short: "S1", kanji: "準一級", color: "#9A4DFF", glow: "154 77 255", feel: "Rising storm" },
+  g1: { label: "Grade 1", short: "G1", kanji: "一級", color: "#E0335A", glow: "224 51 90", feel: "Burning crimson" },
+  special: { label: "Special Grade", short: "SP", kanji: "特級", color: "#FF3B2F", glow: "255 59 47", feel: "Beyond measure" },
 };
 
 export const GRADE_ORDER: GradeKey[] = ["g4", "g3", "g2", "semi1", "g1", "special"];
