@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { CircleUserRound, LayoutGrid, Map, Plus, Target, Trophy } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { CircleUserRound, LayoutGrid, LogOut, Map, Plus, Target, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NAV } from "@/lib/nav";
-import { me } from "@/lib/mock-data";
+import { signOut } from "@/lib/actions/auth";
 import { CePill, Kanji } from "./primitives";
 import { BACK, FORWARD } from "./transitions";
 
@@ -76,8 +76,11 @@ export function BottomNav() {
   );
 }
 
-export function TopNav() {
+export type NavUser = { ce: number; initials: string; name: string };
+
+export function TopNav({ user }: { user: NavUser | null }) {
   const { pathname, types } = useDirection();
+  const router = useRouter();
   const guest = pathname.startsWith("/onboarding");
   return (
     <header
@@ -89,7 +92,7 @@ export function TopNav() {
           <Kanji className="text-[28px]">呪</Kanji>
           <span className="font-display text-lg font-extrabold">Cursed Mission Board</span>
         </Link>
-        {!guest && (
+        {!guest && user && (
           <>
             <nav aria-label="Primary" className="flex gap-1.5 text-[15px]">
               {NAV.map(({ label, href }, i) => {
@@ -120,14 +123,27 @@ export function TopNav() {
                 <Plus className="size-4" aria-hidden />
                 Create quest
               </Link>
-              <CePill value={me.ce} className="h-10 bg-night-950" />
+              <CePill value={user.ce} className="h-10 bg-night-950" />
               <Link
                 href="/me"
                 aria-label="Your profile"
                 className="flex size-10 items-center justify-center rounded-full bg-night-700 text-[13px] font-bold transition-shadow hover:shadow-[0_0_0_2px_#3D8BFF]"
               >
-                {me.initials}
+                {user.initials}
               </Link>
+              <button
+                type="button"
+                aria-label="Sign out"
+                title="Sign out"
+                onClick={async () => {
+                  await signOut();
+                  router.push("/onboarding");
+                  router.refresh();
+                }}
+                className="flex size-10 items-center justify-center rounded-lg border border-night-700 text-mist-300 transition-colors hover:bg-night-700 hover:text-mist-100"
+              >
+                <LogOut className="size-4" aria-hidden />
+              </button>
             </div>
           </>
         )}
