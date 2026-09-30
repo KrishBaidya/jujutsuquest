@@ -1,14 +1,19 @@
 import "server-only";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
-// Gemini through the Vercel AI Gateway. With `ai` v7 a plain "provider/model"
-// string is routed through the gateway, authenticated by AI_GATEWAY_API_KEY
-// locally or the OIDC token on Vercel. Import only from server actions.
+// Gemini called directly through Google's API with the AI SDK provider,
+// authenticated by an API key from Google AI Studio. GEMINI_API_KEY is
+// accepted as a shorter alias for the SDK's own variable name.
+// Import only from server actions.
 
-export const GEMINI_VISION_MODEL = process.env.GEMINI_MODEL ?? "google/gemini-2.5-flash";
+const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY;
 
-/** False when no gateway credentials exist; callers must fall back to manual review. */
-export const hasGemini = () =>
-  Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_OIDC_TOKEN);
+const google = createGoogleGenerativeAI({ apiKey });
+
+export const geminiVision = google(process.env.GEMINI_MODEL ?? "gemini-2.5-flash");
+
+/** False when no Gemini key is set; callers must fall back to manual review. */
+export const hasGemini = () => Boolean(apiKey);
 
 /** At or above this, Gemini's verdict is applied automatically; below it, a human reviews. */
 export const AUTO_DECISION_CONFIDENCE = 0.8;

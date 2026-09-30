@@ -1,7 +1,7 @@
 import "server-only";
 import { generateText, Output } from "ai";
 import { z } from "zod";
-import { GEMINI_VISION_MODEL, hasGemini } from "./model";
+import { geminiVision, hasGemini } from "./model";
 
 const verdictSchema = z.object({
   matches: z.boolean().describe("True only if the photo clearly shows the required location and subject."),
@@ -27,14 +27,14 @@ export type VerifyPhotoInput = {
 
 /**
  * Asks Gemini whether a photo shows the quest location. Returns null when no
- * gateway credentials exist or the call fails; callers then route the
+ * Gemini key is set or the call fails; callers then route the
  * submission to a human reviewer.
  */
 export async function verifyPhoto(input: VerifyPhotoInput): Promise<PhotoVerdict | null> {
   if (!hasGemini()) return null;
   try {
     const { output } = await generateText({
-      model: GEMINI_VISION_MODEL,
+      model: geminiVision,
       output: Output.object({ schema: verdictSchema }),
       messages: [
         {
