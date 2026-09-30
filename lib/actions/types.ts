@@ -63,3 +63,11 @@ export type LeaveResidue = (input: {
   locationId: string;
 }) => Promise<ActionResult<{ postId: string }>>;
 export type ToggleResidueLike = (postId: string) => Promise<ActionResult<{ liked: boolean; likes: number }>>;
+
+/** Redraws a residue photo in the JJK anime style with Gemini. Returns the new image as a data URL. */
+export type ConjureResidue = (input: {
+  photoDataUrl: string;
+  width: number;
+  height: number;
+  locationId: string;
+}) => Promise<ActionResult<{ imageDataUrl: string }>>;
