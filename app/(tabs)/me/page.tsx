@@ -37,6 +37,14 @@ export default async function MePage() {
       <header className="flex items-center justify-between px-5 pt-[calc(env(safe-area-inset-top)+16px)] lg:px-0 lg:pt-0">
         <h1 className="font-display text-2xl font-extrabold lg:text-[32px]">Me</h1>
         <div className="flex gap-2">
+          <Link
+            href="/archive"
+            transitionTypes={FORWARD}
+            className="flex h-10 items-center gap-1.5 rounded-full border border-night-700 bg-night-800 px-3 text-[13px] font-bold transition-colors hover:bg-night-700"
+          >
+            <Kanji className="text-base">録</Kanji>
+            Archive
+          </Link>
           {user.role === "reviewer" && (
             <Link
               href="/me/review"
