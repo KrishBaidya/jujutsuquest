@@ -5,18 +5,10 @@ import L from "leaflet";
 import { useEffect, useMemo } from "react";
 import { Circle, MapContainer, Marker, Polygon, TileLayer, useMap } from "react-leaflet";
 import { GRADES } from "@/lib/grades";
-import {
-  ACTIVE_PLACE,
-  CAMPUS_BOUNDS,
-  CAMPUS_CENTER,
-  YOU,
-  campusPlaces,
-  ring,
-  type CampusPlace,
-} from "@/lib/campus";
+import { CAMPUS_CENTER, boundsAround, ring } from "@/lib/campus";
+import type { LocationSummary } from "@/lib/queries/locations";
 
 const CLEARED_RADIUS = 70; // metres of veil lifted around a cleared place
-const GEOFENCE_RADIUS = 45;
 
 // One big polygon covering the region with a hole punched at every cleared place.
 const WORLD: [number, number][] = [
@@ -25,16 +17,11 @@ const WORLD: [number, number][] = [
   [30.82, 76.63],
   [30.82, 76.52],
 ];
-const VEIL = [
-  WORLD,
-  ...campusPlaces.filter((p) => p.cleared).map((p) => ring(p.lat, p.lng, CLEARED_RADIUS)),
-];
 
-const escapeHtml = (s: string) =>
-  s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
-function pinIcon(place: CampusPlace, active: boolean) {
-  const color = GRADES[place.grade].color;
+function pinIcon(place: LocationSummary, active: boolean) {
+  const color = GRADES[place.topGrade].color;
   return L.divIcon({
     className: "",
     iconSize: [0, 0],
@@ -45,47 +32,50 @@ function pinIcon(place: CampusPlace, active: boolean) {
   });
 }
 
-const youIcon = L.divIcon({ className: "", iconSize: [0, 0], html: `<div class="cmb-you"></div>` });
-
-/** Pans to the selected place, and to the student when `locateTick` changes. */
-function Camera({ selected, locateTick }: { selected?: CampusPlace; locateTick: number }) {
+/** Pans to the selected place. */
+function Camera({ selected }: { selected?: LocationSummary }) {
   const map = useMap();
+  const lat = selected?.lat;
+  const lng = selected?.lng;
 
   useEffect(() => {
-    if (selected) map.flyTo([selected.lat, selected.lng], Math.max(map.getZoom(), 17), { duration: 0.6 });
-  }, [map, selected]);
-
-  useEffect(() => {
-    if (locateTick > 0) map.flyTo(YOU, 18, { duration: 0.6 });
-  }, [map, locateTick]);
+    if (lat !== undefined && lng !== undefined) {
+      map.flyTo([lat, lng], Math.max(map.getZoom(), 17), { duration: 0.6 });
+    }
+  }, [map, lat, lng]);
 
   return null;
 }
 
 export default function CampusMap({
+  locations,
   selectedId,
   onSelect,
-  locateTick,
 }: {
+  locations: LocationSummary[];
   selectedId?: string;
   onSelect: (id: string) => void;
-  locateTick: number;
 }) {
-  const selected = campusPlaces.find((p) => p.id === selectedId);
-  const active = campusPlaces.find((p) => p.id === ACTIVE_PLACE)!;
+  const selected = locations.find((p) => p.id === selectedId);
+  const cleared = useMemo(() => locations.filter((p) => p.cleared), [locations]);
+  const bounds = useMemo(() => boundsAround(locations), [locations]);
+  const veil = useMemo(
+    () => [WORLD, ...cleared.map((p) => ring(p.lat, p.lng, CLEARED_RADIUS))],
+    [cleared],
+  );
 
   const icons = useMemo(
-    () => Object.fromEntries(campusPlaces.map((p) => [p.id, pinIcon(p, p.id === selectedId)])),
-    [selectedId],
+    () => Object.fromEntries(locations.map((p) => [p.id, pinIcon(p, p.id === selectedId)])),
+    [locations, selectedId],
   );
 
   return (
     <MapContainer
-      center={CAMPUS_CENTER}
+      center={selected ? [selected.lat, selected.lng] : CAMPUS_CENTER}
       zoom={16}
       minZoom={15}
       maxZoom={19}
-      maxBounds={CAMPUS_BOUNDS}
+      maxBounds={bounds}
       maxBoundsViscosity={0.8}
       zoomControl={false}
       className="campus-map absolute inset-0 z-0"
@@ -98,51 +88,35 @@ export default function CampusMap({
 
       {/* the veil */}
       <Polygon
-        positions={VEIL}
+        key={cleared.map((p) => p.id).join(",")}
+        positions={veil}
         interactive={false}
         pathOptions={{ stroke: false, fillColor: "#0B0C0F", fillOpacity: 0.62 }}
       />
-      {campusPlaces
-        .filter((p) => p.cleared)
-        .map((p) => (
-          <Circle
-            key={p.id}
-            center={[p.lat, p.lng]}
-            radius={CLEARED_RADIUS}
-            interactive={false}
-            pathOptions={{ color: "#EFE9DC", opacity: 0.4, weight: 1, dashArray: "4 5", fill: false }}
-          />
-        ))}
+      {cleared.map((p) => (
+        <Circle
+          key={p.id}
+          center={[p.lat, p.lng]}
+          radius={CLEARED_RADIUS}
+          interactive={false}
+          pathOptions={{ color: "#EFE9DC", opacity: 0.4, weight: 1, dashArray: "4 5", fill: false }}
+        />
+      ))}
 
-      {/* geofence of the mission the student is standing in */}
-      <Circle
-        center={[active.lat, active.lng]}
-        radius={GEOFENCE_RADIUS}
-        interactive={false}
-        pathOptions={{
-          className: "cmb-geofence",
-          color: "#3D8BFF",
-          weight: 2,
-          fillColor: "#3D8BFF",
-          fillOpacity: 0.18,
-        }}
-      />
-
-      {campusPlaces.map((p) => (
+      {locations.map((p) => (
         <Marker
           key={p.id}
           position={[p.lat, p.lng]}
           icon={icons[p.id]}
           title={p.name}
-          alt={`${p.name}, ${GRADES[p.grade].label}`}
+          alt={`${p.name}, ${p.cleared ? "cleared" : "veiled"}`}
           keyboard
           zIndexOffset={p.id === selectedId ? 1000 : 0}
           eventHandlers={{ click: () => onSelect(p.id) }}
         />
       ))}
-      <Marker position={YOU} icon={youIcon} interactive={false} zIndexOffset={500} />
 
-      <Camera selected={selected} locateTick={locateTick} />
+      <Camera selected={selected} />
     </MapContainer>
   );
 }
