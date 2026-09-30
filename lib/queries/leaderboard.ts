@@ -217,11 +217,7 @@ function build(raw: Raw, period: LeaderboardPeriod): LeaderboardSnapshot {
 
   const version = createHash("sha1")
     .update(
-      JSON.stringify([
-        students.map((s) => [s.id, s.pos, s.score, s.ce, s.weekGain, s.grade, s.move]),
-        hostels.map((h) => [h.id, h.pos, h.ce, h.weekGain]),
-        seats.map((s) => s.holder?.id ?? null),
-      ]),
+      JSON.stringify([students, hostels, seats, challenger]),
     )
     .digest("hex")
     .slice(0, 16);
