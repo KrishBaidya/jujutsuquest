@@ -91,7 +91,7 @@ export function MapView({
       {/* Vignette and grain over the tiles */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 z-[400] bg-[radial-gradient(120%_90%_at_50%_45%,transparent_40%,rgb(3_3_5/0.85))]"
+        className="pointer-events-none absolute inset-0 z-[400] bg-[radial-gradient(130%_100%_at_50%_45%,transparent_55%,rgb(3_3_5/0.6))]"
       />
 
       {/* HUD */}
@@ -111,10 +111,27 @@ export function MapView({
               <span key={l.id} className={cn("h-1 flex-1", l.cleared ? "bg-bone" : "bg-ink-500")} />
             ))}
           </div>
-          <p className="kanji mt-2 hidden text-[11px] text-fg-faint lg:block">闇より出でて闇より黒く</p>
+          <ul className="mt-3 hidden flex-col gap-1.5 border-t border-ink-600 pt-2.5 text-[11px] text-fg-muted lg:flex">
+            <li className="flex items-center gap-2">
+              <span className="kanji w-5 text-center text-[14px] text-cursed-soft">帳</span>
+              Curtain around campus
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="kanji w-5 text-center text-[14px] text-cursed">呪</span>
+              Cursed spirit: missions open
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="kanji w-5 text-center text-[14px] text-gold">祓</span>
+              Exorcised: roped off
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="kanji w-5 text-center text-[14px] text-blood">域</span>
+              Selected: domain expanded
+            </li>
+          </ul>
         </div>
 
-        <div className="pointer-events-auto flex flex-col items-end gap-2">
+        <div className="pointer-events-auto flex flex-col items-end gap-2 lg:mr-[412px]">
           <button
             type="button"
             onClick={() => setSensing("on")}
@@ -129,12 +146,7 @@ export function MapView({
             <Crosshair className={cn("size-4", sensing === "on" && !me && "animate-spin")} aria-hidden />
             {sensing === "denied" ? "Location blocked" : sensing === "on" ? (me ? "Sensing you" : "Sensing…") : "Sense me"}
           </button>
-          <span
-            aria-hidden
-            className="kanji flex size-11 items-center justify-center border border-ink-500 bg-ink-900/90 text-[18px] text-blood backdrop-blur-md"
-          >
-            北
-          </span>
+          <Compass />
         </div>
       </div>
 
@@ -173,6 +185,37 @@ export function MapView({
         </div>
       </div>
     </div>
+  );
+}
+
+/** Compass rose with kanji cardinals. The map is always north-up. */
+function Compass() {
+  return (
+    <svg aria-hidden viewBox="-30 -30 60 60" className="size-[60px] drop-shadow-[0_2px_8px_rgb(0_0_0/0.8)]">
+      <circle r="27" fill="rgb(11 10 15 / 0.9)" stroke="var(--color-ink-500)" />
+      <circle r="21" fill="none" stroke="var(--color-ink-500)" strokeDasharray="1 3" />
+      <path d="M0 -19 L4 0 L0 4 L-4 0 Z" fill="var(--color-blood)" />
+      <path d="M0 19 L4 0 L0 -4 L-4 0 Z" fill="var(--color-bone)" opacity="0.7" />
+      {[
+        ["北", 0, -23],
+        ["南", 0, 26],
+        ["東", 24.5, 1.5],
+        ["西", -24.5, 1.5],
+      ].map(([k, x, y]) => (
+        <text
+          key={k}
+          x={x}
+          y={y}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fontSize={k === "北" ? 9 : 7}
+          fill={k === "北" ? "var(--color-blood-bright)" : "var(--color-fg-muted)"}
+          style={{ fontFamily: "var(--font-brush)" }}
+        >
+          {k}
+        </text>
+      ))}
+    </svg>
   );
 }
 
