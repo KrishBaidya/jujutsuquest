@@ -23,7 +23,7 @@ export default function MissionsPage() {
           <Link
             href={SCAN_HREF}
             transitionTypes={FORWARD}
-            className="hidden h-11 items-center gap-2 rounded-lg bg-cursed-500 px-4 text-[15px] font-bold text-white transition-colors hover:bg-[#6a4ef0] lg:flex"
+            className="hidden h-11 items-center gap-2 rounded-lg bg-cursed-500 px-4 text-[15px] font-bold text-night-950 transition-colors hover:bg-[#62a2ff] lg:flex"
           >
             <QrCode className="size-5" aria-hidden />
             Scan checkpoint
@@ -49,7 +49,7 @@ export default function MissionsPage() {
                 className="block transition-transform duration-300 hover:-translate-y-1"
               >
                 <ScrollCard
-                  glow={m.kind === "walk" ? "122,92,255,0.55" : "122,92,255,0.35"}
+                  glow={m.kind === "walk" ? "61,139,255,0.55" : "61,139,255,0.35"}
                   blur={m.kind === "walk" ? 18 : 14}
                   pulse={m.kind === "walk"}
                   index={i}
@@ -62,7 +62,7 @@ export default function MissionsPage() {
                     </span>
                     {m.kind === "walk" ? (
                       <span className="flex items-center gap-[5px] text-[13px] font-bold">
-                        <span className="size-2 animate-pulse rounded-full bg-cursed-500 shadow-[0_0_6px_#7A5CFF]" />
+                        <span className="size-2 animate-pulse rounded-full bg-cursed-500 shadow-[0_0_6px_#3D8BFF]" />
                         Tracking
                       </span>
                     ) : (
@@ -84,9 +84,9 @@ export default function MissionsPage() {
                       </div>
                       <div className="flex h-[72px] w-24 flex-none items-center justify-center rounded bg-night-800">
                         <svg width="84" height="60" viewBox="0 0 84 60" aria-hidden>
-                          <path d="M10 50 C 18 14, 50 6, 64 22 S 76 52, 42 50" fill="none" stroke="#3a3264" strokeWidth="4" strokeLinecap="round" />
-                          <path d="M10 50 C 18 14, 50 6, 64 22 S 76 52, 42 50" fill="none" stroke="#B9A6FF" strokeWidth="4" strokeLinecap="round" strokeDasharray="100 200" />
-                          <circle cx="68" cy="36" r="4" fill="#4C9BFF" className="animate-pulse" />
+                          <path d="M10 50 C 18 14, 50 6, 64 22 S 76 52, 42 50" fill="none" stroke="#3b404d" strokeWidth="4" strokeLinecap="round" />
+                          <path d="M10 50 C 18 14, 50 6, 64 22 S 76 52, 42 50" fill="none" stroke="#9CC4FF" strokeWidth="4" strokeLinecap="round" strokeDasharray="100 200" />
+                          <circle cx="68" cy="36" r="4" fill="#5FD0E6" className="animate-pulse" />
                         </svg>
                       </div>
                     </div>
@@ -160,7 +160,7 @@ export default function MissionsPage() {
         href={SCAN_HREF}
         transitionTypes={FORWARD}
         aria-label="Scan a QR code"
-        className="fixed bottom-[104px] right-[max(20px,calc(50%-195px))] z-10 flex size-[58px] items-center justify-center rounded-full bg-cursed-500 text-white shadow-[0_8px_24px_rgba(122,92,255,0.5)] transition-transform active:scale-95 lg:hidden"
+        className="fixed bottom-[104px] right-[max(20px,calc(50%-195px))] z-10 flex size-[58px] items-center justify-center rounded-full bg-cursed-500 text-night-950 shadow-[0_8px_24px_rgba(61,139,255,0.5)] transition-transform active:scale-95 lg:hidden"
       >
         <QrCode className="size-7" aria-hidden />
       </Link>

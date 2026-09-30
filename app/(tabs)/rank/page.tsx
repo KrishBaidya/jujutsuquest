@@ -66,7 +66,7 @@ function Special() {
           s.name ? (
             <div
               key={s.seat}
-              className="rise-in flex h-[232px] flex-col items-center gap-2 rounded-[3px] bg-washi-100 px-2.5 py-[18px] text-center text-sumi-900 shadow-[inset_0_0_0_4px_#F2E6CB,inset_0_0_0_6px_#C22E26,0_0_26px_rgba(224,32,42,0.45)] lg:w-[180px]"
+              className="rise-in flex h-[232px] flex-col items-center gap-2 rounded-[3px] bg-washi-100 px-2.5 py-[18px] text-center text-sumi-900 shadow-[inset_0_0_0_4px_#EFE9DC,inset_0_0_0_6px_#D8392B,0_0_26px_rgba(229,50,45,0.45)] lg:w-[180px]"
               style={{ animationDelay: `${i * 120}ms` }}
             >
               <span className="flex size-[38px] items-center justify-center rounded-full bg-seal-600 font-display text-xl font-extrabold text-washi-100">

@@ -45,8 +45,8 @@ export default function MePage() {
       <div className="flex flex-col gap-[30px] px-6 pb-8 pt-[22px] lg:grid lg:grid-cols-[380px_minmax(0,1fr)] lg:items-start lg:gap-12 lg:px-0 lg:pb-0 lg:pt-10">
         <div className="max-lg:contents lg:sticky lg:top-[104px] lg:flex lg:flex-col lg:gap-8">
           <section className="relative max-lg:order-1">
-            <div className="absolute -inset-5 bg-[radial-gradient(ellipse,rgba(91,140,255,0.3),transparent_68%)]" />
-            <div className="paper rise-in relative flex flex-col gap-3.5 rounded px-5 py-[22px] shadow-[inset_0_0_0_1px_#E0CFA6,inset_0_0_0_6px_#F2E6CB,inset_0_0_0_7px_#5B3A22]">
+            <div className="absolute -inset-5 bg-[radial-gradient(ellipse,rgba(79,163,255,0.3),transparent_68%)]" />
+            <div className="paper rise-in relative flex flex-col gap-3.5 rounded px-5 py-[22px] shadow-[inset_0_0_0_1px_#DDD5C3,inset_0_0_0_6px_#EFE9DC,inset_0_0_0_7px_#4A3426]">
               <div className="flex items-center gap-3.5">
                 <span className="flex size-14 items-center justify-center rounded-full bg-sumi-600 font-bold text-washi-100">
                   {me.initials}
@@ -102,7 +102,7 @@ export default function MePage() {
                     {["bg-washi-500", "bg-washi-300", "bg-washi-500"].map((c, i) => (
                       <span
                         key={i}
-                        className={`size-[26px] rounded-full ${c} shadow-[0_0_0_2px_#F2E6CB] ${i ? "-ml-1.5" : ""}`}
+                        className={`size-[26px] rounded-full ${c} shadow-[0_0_0_2px_#EFE9DC] ${i ? "-ml-1.5" : ""}`}
                       />
                     ))}
                   </span>
@@ -158,7 +158,7 @@ export default function MePage() {
                       <Lock className="size-5" aria-hidden />
                     </div>
                   ) : (
-                    <div className="flex h-[84px] w-[52px] items-center justify-center rounded-[2px] bg-gradient-to-br from-washi-100 to-washi-300 font-display text-2xl font-extrabold text-sumi-900 shadow-[inset_0_0_0_2px_#D9A441,inset_0_0_0_4px_#F2E6CB,inset_0_0_0_5px_#D9A441,0_0_16px_rgba(217,164,65,0.35)] transition-transform duration-300 hover:-translate-y-1 hover:rotate-2">
+                    <div className="flex h-[84px] w-[52px] items-center justify-center rounded-[2px] bg-gradient-to-br from-washi-100 to-washi-300 font-display text-2xl font-extrabold text-sumi-900 shadow-[inset_0_0_0_2px_#E0B04A,inset_0_0_0_4px_#EFE9DC,inset_0_0_0_5px_#E0B04A,0_0_16px_rgba(224,176,74,0.35)] transition-transform duration-300 hover:-translate-y-1 hover:rotate-2">
                       {b.k}
                     </div>
                   )}
@@ -188,7 +188,7 @@ export default function MePage() {
                   }`}
                 >
                   {f.found && (
-                    <span className="size-3.5 rotate-45 animate-pulse bg-gold-400 shadow-[0_0_10px_#D9A441]" />
+                    <span className="size-3.5 rotate-45 animate-pulse bg-gold-400 shadow-[0_0_10px_#E0B04A]" />
                   )}
                 </div>
               ))}

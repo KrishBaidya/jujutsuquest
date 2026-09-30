@@ -25,7 +25,7 @@ const Dot = ({ on }: { on: boolean }) => (
   <span
     className={cn(
       "size-[5px] rounded-full transition-all duration-300",
-      on ? "bg-cursed-300 shadow-[0_0_8px_2px_rgba(122,92,255,0.8)]" : "scale-0",
+      on ? "bg-cursed-300 shadow-[0_0_8px_2px_rgba(61,139,255,0.8)]" : "scale-0",
     )}
   />
 );
@@ -124,7 +124,7 @@ export function TopNav() {
               <Link
                 href="/me"
                 aria-label="Your profile"
-                className="flex size-10 items-center justify-center rounded-full bg-night-700 text-[13px] font-bold transition-shadow hover:shadow-[0_0_0_2px_#7A5CFF]"
+                className="flex size-10 items-center justify-center rounded-full bg-night-700 text-[13px] font-bold transition-shadow hover:shadow-[0_0_0_2px_#3D8BFF]"
               >
                 {me.initials}
               </Link>

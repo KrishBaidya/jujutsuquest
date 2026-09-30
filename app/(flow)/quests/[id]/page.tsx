@@ -166,7 +166,7 @@ function Squad({ note, className }: { note: string; className?: string }) {
   return (
     <div className={"flex items-center gap-3 rounded bg-washi-300 p-3 text-sumi-900 " + (className ?? "")}>
       <div className="flex">
-        <span className="flex size-8 items-center justify-center rounded-full bg-sumi-600 text-[13px] font-bold text-washi-100 shadow-[0_0_0_2px_#E0CFA6]">
+        <span className="flex size-8 items-center justify-center rounded-full bg-sumi-600 text-[13px] font-bold text-washi-100 shadow-[0_0_0_2px_#DDD5C3]">
           {me.initials}
         </span>
         <span className="-ml-2 flex size-8 items-center justify-center rounded-full border-[1.5px] border-dashed border-sumi-600 bg-washi-300">

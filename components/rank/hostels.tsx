@@ -79,7 +79,7 @@ export function HostelDuel({ compact = false }: { compact?: boolean }) {
             <span className="flex items-center gap-1.5 font-display text-lg font-extrabold">
               {hostel.name}
               {mine && (
-                <span className="rounded-full bg-cursed-500 px-1.5 py-px font-body text-[11px] font-bold text-white">
+                <span className="rounded-full bg-cursed-500 px-1.5 py-px font-body text-[11px] font-bold text-night-950">
                   yours
                 </span>
               )}
@@ -89,7 +89,7 @@ export function HostelDuel({ compact = false }: { compact?: boolean }) {
             </span>
           </div>
         ))}
-        <span className="stamp-in order-2 flex size-11 items-center justify-center rounded-[10px] bg-seal-600 font-display text-xl font-extrabold text-washi-100 shadow-[inset_0_0_0_2px_#C22E26,inset_0_0_0_3px_#F2E6CB]">
+        <span className="stamp-in order-2 flex size-11 items-center justify-center rounded-[10px] bg-seal-600 font-display text-xl font-extrabold text-washi-100 shadow-[inset_0_0_0_2px_#D8392B,inset_0_0_0_3px_#EFE9DC]">
           対
         </span>
       </div>

@@ -124,7 +124,7 @@ export function CampusBoard({ aside }: { aside?: React.ReactNode }) {
               <button
                 type="button"
                 onClick={jumpToMe}
-                className="flex h-8 items-center gap-1.5 rounded-full border border-cursed-500 px-3 text-[13px] font-bold text-cursed-300 transition-colors hover:bg-cursed-500 hover:text-white"
+                className="flex h-8 items-center gap-1.5 rounded-full border border-cursed-500 px-3 text-[13px] font-bold text-cursed-300 transition-colors hover:bg-cursed-500 hover:text-night-950"
               >
                 <Target className="size-3.5" aria-hidden />
                 Jump to me
@@ -166,7 +166,7 @@ export function CampusBoard({ aside }: { aside?: React.ReactNode }) {
           onClick={jumpToMe}
           className="sheet-in fixed inset-x-0 bottom-[100px] z-10 mx-auto flex w-full max-w-[430px] px-3.5 text-left lg:hidden"
         >
-          <span className="flex w-full items-center gap-3 rounded-lg border border-cursed-500 bg-night-800 px-3.5 py-3 shadow-[0_0_24px_rgba(122,92,255,0.3)]">
+          <span className="flex w-full items-center gap-3 rounded-lg border border-cursed-500 bg-night-800 px-3.5 py-3 shadow-[0_0_24px_rgba(61,139,255,0.3)]">
             <span className="w-[30px] text-center font-display text-xl font-extrabold text-cursed-300">
               {mine.pos}
             </span>
@@ -217,9 +217,9 @@ function Avatar({ row, size = "md" }: { row: Ranked; size?: "md" | "lg" }) {
       className={cn(
         "flex flex-none items-center justify-center rounded-full font-bold",
         size === "lg" ? "size-14 text-[15px]" : "size-[38px] text-[13px]",
-        row.isMe ? "bg-cursed-500 text-white" : "bg-night-700",
+        row.isMe ? "bg-cursed-500 text-night-950" : "bg-night-700",
       )}
-      style={{ boxShadow: `0 0 0 2px #110D22, 0 0 0 4px ${color}, 0 0 14px ${color}66` }}
+      style={{ boxShadow: `0 0 0 2px #14161B, 0 0 0 4px ${color}, 0 0 14px ${color}66` }}
     >
       {row.initials}
     </span>
@@ -281,7 +281,7 @@ function Row({
       className={cn(
         "flex items-center gap-3 border-b border-line py-2.5 transition-colors lg:px-5",
         row.isMe
-          ? "relative -mx-2 rounded-lg border border-cursed-500 bg-cursed-500/10 px-2 shadow-[0_0_24px_rgba(122,92,255,0.25)] lg:mx-0 lg:rounded-none lg:border-x-0"
+          ? "relative -mx-2 rounded-lg border border-cursed-500 bg-cursed-500/10 px-2 shadow-[0_0_24px_rgba(61,139,255,0.25)] lg:mx-0 lg:rounded-none lg:border-x-0"
           : "lg:hover:bg-night-700/40",
       )}
     >
@@ -321,7 +321,7 @@ function Row({
 
 const PLACES = [
   { kanji: "二", plinth: "h-[64px]", tone: "#C9CCD6", order: "order-1" },
-  { kanji: "一", plinth: "h-[92px]", tone: "#D9A441", order: "order-2" },
+  { kanji: "一", plinth: "h-[92px]", tone: "#E0B04A", order: "order-2" },
   { kanji: "三", plinth: "h-[44px]", tone: "#C0793E", order: "order-3" },
 ];
 
@@ -334,7 +334,7 @@ function Podium({ rows }: { rows: Ranked[] }) {
   ];
   return (
     <div className="relative mx-5 grid grid-cols-3 items-end gap-2 lg:mx-0 lg:gap-4">
-      <div className="pointer-events-none absolute inset-x-[20%] top-0 h-40 bg-[radial-gradient(ellipse,rgba(217,164,65,0.22),transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-x-[20%] top-0 h-40 bg-[radial-gradient(ellipse,rgba(224,176,74,0.22),transparent_70%)]" />
       {slots.map(({ row, kanji, plinth, tone }, i) => {
         const first = row.pos === rows[0].pos;
         return (
@@ -390,7 +390,7 @@ function Standing({ mine, rival, scoped }: { mine: Ranked; rival?: Ranked; scope
   const gap = rival ? rival.score - mine.score + 1 : 0;
   const pct = rival ? Math.max(6, Math.round((mine.score / (rival.score + 1)) * 100)) : 100;
   return (
-    <section className="flex flex-col gap-3.5 rounded-lg border border-cursed-500 bg-night-800 p-4 shadow-[0_0_28px_rgba(122,92,255,0.22)]">
+    <section className="flex flex-col gap-3.5 rounded-lg border border-cursed-500 bg-night-800 p-4 shadow-[0_0_28px_rgba(61,139,255,0.22)]">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5">
         <span className="font-display text-[40px] font-extrabold leading-none text-cursed-300">
           #{mine.pos}
@@ -426,7 +426,7 @@ function Standing({ mine, rival, scoped }: { mine: Ranked; rival?: Ranked; scope
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-night-700">
             <div
-              className="gauge-fill h-full rounded-full bg-gradient-to-r from-azure-500 to-cursed-500 shadow-[0_0_12px_rgba(122,92,255,0.8)]"
+              className="gauge-fill h-full rounded-full bg-gradient-to-r from-azure-500 to-cursed-500 shadow-[0_0_12px_rgba(61,139,255,0.8)]"
               style={{ width: `${pct}%` }}
             />
           </div>

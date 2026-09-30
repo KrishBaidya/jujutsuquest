@@ -100,7 +100,7 @@ export default function CampusMap({
       <Polygon
         positions={VEIL}
         interactive={false}
-        pathOptions={{ stroke: false, fillColor: "#0C0919", fillOpacity: 0.62 }}
+        pathOptions={{ stroke: false, fillColor: "#0B0C0F", fillOpacity: 0.62 }}
       />
       {campusPlaces
         .filter((p) => p.cleared)
@@ -110,7 +110,7 @@ export default function CampusMap({
             center={[p.lat, p.lng]}
             radius={CLEARED_RADIUS}
             interactive={false}
-            pathOptions={{ color: "#F2E6CB", opacity: 0.4, weight: 1, dashArray: "4 5", fill: false }}
+            pathOptions={{ color: "#EFE9DC", opacity: 0.4, weight: 1, dashArray: "4 5", fill: false }}
           />
         ))}
 
@@ -121,9 +121,9 @@ export default function CampusMap({
         interactive={false}
         pathOptions={{
           className: "cmb-geofence",
-          color: "#7A5CFF",
+          color: "#3D8BFF",
           weight: 2,
-          fillColor: "#7A5CFF",
+          fillColor: "#3D8BFF",
           fillOpacity: 0.18,
         }}
       />

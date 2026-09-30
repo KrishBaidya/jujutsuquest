@@ -259,14 +259,14 @@ export type Hostel = {
 
 // Placeholder hostel names and figures; replace with the real roster.
 export const hostels: Hostel[] = [
-  { id: "sukhna", name: "Sukhna", crest: "鳳", color: "#E0202A", members: 212, ce: 96420, wins: 5, losses: 0, streak: 5 },
-  { id: "zakir", name: "Zakir", crest: "龍", color: "#7A5CFF", members: 198, ce: 91870, wins: 4, losses: 1, streak: 3 },
-  { id: "tagore", name: "Tagore", crest: "虎", color: "#D9A441", members: 205, ce: 84310, wins: 3, losses: 2, streak: 1 },
-  { id: "shivalik", name: "Shivalik", crest: "狼", color: "#4C9BFF", members: 187, ce: 79640, wins: 3, losses: 2, streak: -1 },
-  { id: "nek-chand", name: "Nek Chand", crest: "鷹", color: "#2FB38A", members: 176, ce: 66280, wins: 2, losses: 3, streak: 2 },
-  { id: "govind", name: "Govind", crest: "熊", color: "#D6409F", members: 190, ce: 61950, wins: 2, losses: 3, streak: -2 },
-  { id: "le-corbusier", name: "Le Corbusier", crest: "鹿", color: "#FF7A2F", members: 164, ce: 48720, wins: 1, losses: 4, streak: -3 },
-  { id: "aravali", name: "Aravali", crest: "蛇", color: "#6CB4FF", members: 158, ce: 41090, wins: 0, losses: 5, streak: -5 },
+  { id: "sukhna", name: "Sukhna", crest: "鳳", color: "#E5322D", members: 212, ce: 96420, wins: 5, losses: 0, streak: 5 },
+  { id: "zakir", name: "Zakir", crest: "龍", color: "#3D8BFF", members: 198, ce: 91870, wins: 4, losses: 1, streak: 3 },
+  { id: "tagore", name: "Tagore", crest: "虎", color: "#E0B04A", members: 205, ce: 84310, wins: 3, losses: 2, streak: 1 },
+  { id: "shivalik", name: "Shivalik", crest: "狼", color: "#5FD0E6", members: 187, ce: 79640, wins: 3, losses: 2, streak: -1 },
+  { id: "nek-chand", name: "Nek Chand", crest: "鷹", color: "#3FB68B", members: 176, ce: 66280, wins: 2, losses: 3, streak: 2 },
+  { id: "govind", name: "Govind", crest: "熊", color: "#E0508A", members: 190, ce: 61950, wins: 2, losses: 3, streak: -2 },
+  { id: "le-corbusier", name: "Le Corbusier", crest: "鹿", color: "#F0813A", members: 164, ce: 48720, wins: 1, losses: 4, streak: -3 },
+  { id: "aravali", name: "Aravali", crest: "蛇", color: "#8FA3B8", members: 158, ce: 41090, wins: 0, losses: 5, streak: -5 },
 ];
 
 export const hostelById = (id: string) => hostels.find((h) => h.id === id)!;

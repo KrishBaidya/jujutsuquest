@@ -52,9 +52,9 @@ export function BountyCard({ quest }: { quest: Quest }) {
   return (
     <Link href={`/quests/${quest.id}`} transitionTypes={FORWARD} className="relative block">
       <span className="ember absolute -top-2.5 left-[30%] size-1 rounded-full bg-ember-500" />
-      <span className="ember absolute -top-[18px] left-[62%] size-[3px] rounded-full bg-[#FFB27F]" style={{ "--i": 1 } as React.CSSProperties} />
+      <span className="ember absolute -top-[18px] left-[62%] size-[3px] rounded-full bg-[#F7B488]" style={{ "--i": 1 } as React.CSSProperties} />
       <span className="ember absolute -top-1.5 right-[12%] size-[3px] rounded-full bg-ember-500" style={{ "--i": 2 } as React.CSSProperties} />
-      <ScrollCard glow="255,122,47,0.4" blur={14} burning bodyClassName="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-6 lg:p-5">
+      <ScrollCard glow="240,129,58,0.4" blur={14} burning bodyClassName="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-6 lg:p-5">
         <div className="placeholder-photo hidden h-[150px] items-end rounded p-2 lg:flex">
           <span className="font-mono text-[13px] text-sumi-600">scouting photo · library steps</span>
         </div>

@@ -142,7 +142,7 @@ export function BoardView() {
                         </span>
                       </span>
                       <span
-                        className="absolute left-2.5 top-2.5 size-2.5 rounded-full shadow-[0_0_0_2px_#0C0919]"
+                        className="absolute left-2.5 top-2.5 size-2.5 rounded-full shadow-[0_0_0_2px_#0B0C0F]"
                         style={{ background: GRADES[s.grade].color }}
                       />
                     </Link>
@@ -169,7 +169,7 @@ export function BoardView() {
       <Link
         href="/verify/club-fair?mode=qr"
         aria-label="Scan a QR code"
-        className="fixed bottom-[104px] right-[max(20px,calc(50%-195px))] z-10 flex size-[58px] items-center justify-center rounded-full bg-cursed-500 text-white shadow-[0_8px_24px_rgba(122,92,255,0.5)] lg:hidden"
+        className="fixed bottom-[104px] right-[max(20px,calc(50%-195px))] z-10 flex size-[58px] items-center justify-center rounded-full bg-cursed-500 text-night-950 shadow-[0_8px_24px_rgba(61,139,255,0.5)] lg:hidden"
       >
         <QrCode className="size-7" aria-hidden />
       </Link>

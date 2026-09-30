@@ -82,8 +82,8 @@ export function ScrollCard({
         className={cn(
           "paper flex flex-col gap-2 px-4 py-3.5",
           burning
-            ? "shadow-[inset_0_0_0_1px_#8a4a1c,inset_0_0_22px_5px_rgba(70,30,8,0.5),inset_0_0_3px_2px_rgba(255,122,47,0.7)]"
-            : "shadow-[inset_0_0_0_1px_#E0CFA6]",
+            ? "shadow-[inset_0_0_0_1px_#8a4a1c,inset_0_0_22px_5px_rgba(70,30,8,0.5),inset_0_0_3px_2px_rgba(240,129,58,0.7)]"
+            : "shadow-[inset_0_0_0_1px_#DDD5C3]",
           bodyClassName,
         )}
       >
@@ -104,7 +104,7 @@ export function SealedCard({ label = "Reach Semi-Grade 1 to unseal" }: { label?:
           <LockGlyph />
           {label}
         </span>
-        <div className="absolute -bottom-2 -top-2 right-10 flex w-10 rotate-[4deg] flex-col items-center justify-center gap-0.5 bg-washi-100 shadow-[inset_0_0_0_1px_#5B3A22]">
+        <div className="absolute -bottom-2 -top-2 right-10 flex w-10 rotate-[4deg] flex-col items-center justify-center gap-0.5 bg-washi-100 shadow-[inset_0_0_0_1px_#4A3426]">
           <span className="font-display text-xl font-extrabold leading-none text-seal-600">封</span>
           <span className="font-display text-[15px] font-extrabold leading-none">印</span>
         </div>
@@ -152,7 +152,7 @@ export function Action({
     "flex min-h-12 items-center justify-center gap-2 rounded-lg font-bold transition-[transform,background-color,box-shadow] active:translate-y-px",
     size === "lg" ? "h-14 text-[17px]" : "h-[52px] text-[15px]",
     variant === "primary"
-      ? "bg-cursed-500 text-white hover:bg-[#6a4ef0] hover:shadow-[0_6px_24px_rgba(122,92,255,0.45)]"
+      ? "bg-cursed-500 text-night-950 hover:bg-[#62a2ff] hover:shadow-[0_6px_24px_rgba(61,139,255,0.45)]"
       : "border border-night-700 text-mist-100 hover:bg-night-800",
     disabled && "pointer-events-none bg-night-700 text-mist-500",
     className,
@@ -324,7 +324,7 @@ export function CeGauge({
       <div
         className={cn(
           "gauge-fill h-full rounded-full bg-gradient-to-r from-azure-500 to-cursed-500",
-          tone === "night" && "shadow-[0_0_12px_rgba(122,92,255,0.8)]",
+          tone === "night" && "shadow-[0_0_12px_rgba(61,139,255,0.8)]",
         )}
         style={{ width: `${pct}%` }}
       />
