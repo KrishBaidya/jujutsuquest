@@ -1,66 +1,77 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowUp, Flame, Minus, Sparkles, Swords, Target } from "lucide-react";
+import { ArrowDown, ArrowUp, Minus, Sparkles, Swords, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GRADES } from "@/lib/grades";
-import {
-  NEAR_START,
-  TOP_COUNT,
-  departments,
-  leaders,
-  me,
-  type Leader,
-  type Period,
-} from "@/lib/mock-data";
+import type { LeaderboardPeriod, LeaderboardSnapshot, LeaderboardStudent } from "@/lib/queries/leaderboard";
+import { useLeaderboard } from "@/lib/hooks/use-leaderboard";
 import { Chip, Segmented } from "@/components/app/primitives";
-import { CountUp } from "@/components/app/count-up";
 import { Scroller } from "@/components/app/scroller";
+import { HostelDuel } from "@/components/rank/hostels";
+import { LiveBadge } from "@/components/rank/live-badge";
+import { useFlip } from "@/components/rank/use-flip";
 
-type Ranked = Leader & { pos: number; score: number };
+type Ranked = LeaderboardStudent & { isMe: boolean };
 
-const PERIODS: { value: Period; label: string }[] = [
+const PERIODS: { value: LeaderboardPeriod; label: string }[] = [
   { value: "week", label: "This week" },
   { value: "term", label: "Term" },
   { value: "all", label: "All time" },
 ];
 
-const HOT_STREAK = 7;
+const fmt = (n: number) => n.toLocaleString("en-US");
 
-function rank(period: Period, dept: string): { rows: Ranked[]; gapAfter: number | null } {
-  const byScore = (a: Leader, b: Leader) => b.ce[period] - a.ce[period];
-  if (dept !== "all") {
-    const rows = leaders
-      .filter((l) => l.dept === dept)
-      .sort(byScore)
-      .map((l, i) => ({ ...l, pos: i + 1, score: l.ce[period] }));
-    return { rows, gapAfter: null };
-  }
-  // Campus-wide: the top of the table, then the student's own neighbourhood.
-  const top = leaders.slice(0, TOP_COUNT).sort(byScore);
-  const near = leaders.slice(TOP_COUNT).sort(byScore);
-  return {
-    rows: [
-      ...top.map((l, i) => ({ ...l, pos: i + 1, score: l.ce[period] })),
-      ...near.map((l, i) => ({ ...l, pos: NEAR_START + i, score: l.ce[period] })),
-    ],
-    gapAfter: TOP_COUNT,
-  };
+/** Positions within the current filter. All-campus keeps the server's positions. */
+function rank(snapshot: LeaderboardSnapshot, dept: string, meId: string | null): Ranked[] {
+  return snapshot.students
+    .filter((s) => dept === "all" || s.department === dept)
+    .map((s, i) => ({ ...s, pos: dept === "all" ? s.pos : i + 1, isMe: s.id === meId }));
 }
 
-export function CampusBoard({ aside }: { aside?: React.ReactNode }) {
-  const [period, setPeriod] = useState<Period>("term");
+export function CampusBoard({
+  initial,
+  meId,
+  meHostelId,
+}: {
+  initial: Record<LeaderboardPeriod, LeaderboardSnapshot>;
+  meId: string | null;
+  meHostelId: string | null;
+}) {
+  const [period, setPeriod] = useState<LeaderboardPeriod>("term");
   const [dept, setDept] = useState("all");
   const [meVisible, setMeVisible] = useState(true);
   const meRow = useRef<HTMLLIElement>(null);
   const standing = useRef<HTMLDivElement>(null);
 
-  const { rows, gapAfter } = rank(period, dept);
+  const { snapshot: latest, live } = useLeaderboard(initial, period);
+  const snapshot = latest ?? initial[period];
+
+  // Rows whose score rose since the previous snapshot flash once.
+  const [seen, setSeen] = useState(snapshot);
+  const [flash, setFlash] = useState<ReadonlySet<string>>(new Set());
+  if (snapshot !== seen) {
+    setSeen(snapshot);
+    if (snapshot.period === seen.period) {
+      const before = new Map(seen.students.map((s) => [s.id, s.score]));
+      setFlash(new Set(snapshot.students.filter((s) => s.score > (before.get(s.id) ?? s.score)).map((s) => s.id)));
+    } else {
+      setFlash(new Set());
+    }
+  }
+
+  const departments = [...new Set(snapshot.students.map((s) => s.department))].sort();
+  const activeDept = dept === "all" || departments.includes(dept) ? dept : "all";
+  const rows = rank(snapshot, activeDept, meId);
   const podium = rows.slice(0, 3);
   const rest = rows.slice(3);
   const meIndex = rows.findIndex((r) => r.isMe);
   const mine = meIndex >= 0 ? rows[meIndex] : undefined;
   const rival = meIndex > 0 ? rows[meIndex - 1] : undefined;
+
+  const list = useFlip<HTMLOListElement>(rest.map((r) => r.id).join(), flash);
+  const meInList = meIndex >= 3;
+  const hasMe = !!mine;
 
   useEffect(() => {
     const targets = [meRow.current, standing.current].filter((el) => el !== null);
@@ -78,9 +89,10 @@ export function CampusBoard({ aside }: { aside?: React.ReactNode }) {
     );
     targets.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, [period, dept]);
+  }, [period, activeDept, meInList, hasMe]);
 
-  const jumpToMe = () => meRow.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const jumpToMe = () =>
+    (meRow.current ?? standing.current)?.scrollIntoView({ behavior: "smooth", block: "center" });
 
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start lg:gap-10">
@@ -95,30 +107,31 @@ export function CampusBoard({ aside }: { aside?: React.ReactNode }) {
             className="lg:w-[320px] lg:flex-none"
           />
           <Scroller label="Filter by department" className="-mx-5 min-w-0 lg:mx-0 lg:flex-1" trackClassName="gap-2 px-5 lg:px-0">
-            <Chip active={dept === "all"} onClick={() => setDept("all")} className="px-3.5">
+            <Chip active={activeDept === "all"} onClick={() => setDept("all")} className="px-3.5">
               All schools
             </Chip>
             {departments.map((d) => (
-              <Chip key={d} active={dept === d} onClick={() => setDept(d)}>
+              <Chip key={d} active={activeDept === d} onClick={() => setDept(d)}>
                 {d}
               </Chip>
             ))}
           </Scroller>
         </div>
 
-        {podium.length === 3 && <Podium key={`${period}-${dept}`} rows={podium} />}
+        {podium.length === 3 && <Podium key={`${period}-${activeDept}`} rows={podium} />}
 
         {/* mobile: standing sits between podium and list */}
         {mine && (
           <div ref={standing} className="px-5 lg:hidden">
-            <Standing mine={mine} rival={rival} scoped={dept !== "all"} />
+            <Standing mine={mine} rival={rival} scoped={activeDept !== "all"} />
           </div>
         )}
 
         <section className="lg:overflow-hidden lg:rounded-lg lg:border lg:border-night-700 lg:bg-night-800">
           <div className="flex items-center justify-between px-5 pb-2 lg:border-b lg:border-night-700 lg:py-3">
-            <h2 className="text-[13px] text-mist-500">
-              {dept === "all" ? `${me.campusSize} sorcerers` : `${rows.length} shown in ${dept}`}
+            <h2 className="flex items-center gap-2.5 text-[13px] text-mist-500">
+              {activeDept === "all" ? `${rows.length} sorcerers` : `${rows.length} shown in ${activeDept}`}
+              <LiveBadge live={live} />
             </h2>
             {mine && (
               <button
@@ -131,23 +144,11 @@ export function CampusBoard({ aside }: { aside?: React.ReactNode }) {
               </button>
             )}
           </div>
-          <ol className="scroll-y flex flex-col px-5 pb-[110px] lg:max-h-[520px] lg:pb-0">
+          <ol ref={list} className="scroll-y relative flex flex-col px-5 pb-[110px] lg:max-h-[520px] lg:pb-0">
             {rows.length < 3 &&
               rows.map((r) => <Row key={r.id} row={r} above={undefined} ref={r.isMe ? meRow : undefined} />)}
             {rows.length >= 3 &&
-              rest.map((r, i) => {
-                const index = i + 3;
-                return (
-                  <FragmentRow
-                    key={r.id}
-                    showGap={gapAfter === index}
-                    from={TOP_COUNT + 1}
-                    to={NEAR_START - 1}
-                  >
-                    <Row row={r} above={rows[index - 1]} gapBroken={gapAfter === index} ref={r.isMe ? meRow : undefined} />
-                  </FragmentRow>
-                );
-              })}
+              rest.map((r, i) => <Row key={r.id} row={r} above={rows[i + 2]} ref={r.isMe ? meRow : undefined} />)}
             {rows.length === 0 && (
               <li className="py-10 text-center text-[15px] text-mist-300">No sorcerers ranked here yet.</li>
             )}
@@ -156,8 +157,8 @@ export function CampusBoard({ aside }: { aside?: React.ReactNode }) {
       </div>
 
       <aside className="hidden flex-col gap-6 lg:sticky lg:top-[104px] lg:flex">
-        {mine && <Standing mine={mine} rival={rival} scoped={dept !== "all"} />}
-        {aside}
+        {mine && <Standing mine={mine} rival={rival} scoped={activeDept !== "all"} />}
+        <HostelDuel hostels={snapshot.hostels} meHostelId={meHostelId} compact />
       </aside>
 
       {mine && !meVisible && (
@@ -174,39 +175,14 @@ export function CampusBoard({ aside }: { aside?: React.ReactNode }) {
             <span className="flex flex-1 flex-col">
               <span className="text-[15px] font-bold">You</span>
               <span className="text-[13px] text-mist-300">
-                {rival ? `${(rival.score - mine.score + 1).toLocaleString("en-US")} CE to pass ${rival.name.split(" ")[0]}` : "Top of the table"}
+                {rival ? `${fmt(rival.score - mine.score + 1)} CE to pass ${rival.name.split(" ")[0]}` : "Top of the table"}
               </span>
             </span>
-            <span className="font-display text-[17px] font-extrabold">{mine.score.toLocaleString("en-US")}</span>
+            <span className="font-display text-[17px] font-extrabold">{fmt(mine.score)}</span>
           </span>
         </button>
       )}
     </div>
-  );
-}
-
-function FragmentRow({
-  children,
-  showGap,
-  from,
-  to,
-}: {
-  children: React.ReactNode;
-  showGap: boolean;
-  from: number;
-  to: number;
-}) {
-  return (
-    <>
-      {showGap && (
-        <li aria-hidden className="flex items-center gap-3 py-3 text-[13px] text-mist-500">
-          <span className="h-px flex-1 bg-line" />
-          ranks {from}–{to}
-          <span className="h-px flex-1 bg-line" />
-        </li>
-      )}
-      {children}
-    </>
   );
 }
 
@@ -252,32 +228,21 @@ function Move({ move }: { move: number | null }) {
   );
 }
 
-function Streak({ days }: { days: number }) {
-  if (days < HOT_STREAK) return null;
-  return (
-    <span className="flex items-center gap-0.5 rounded-full bg-ember-500/15 px-1.5 text-[11px] font-bold text-ember-500">
-      <Flame className="flame size-3" aria-hidden />
-      {days}
-    </span>
-  );
-}
-
 function Row({
   row,
   above,
-  gapBroken,
   ref,
 }: {
   row: Ranked;
   above: Ranked | undefined;
-  gapBroken?: boolean;
   ref?: React.Ref<HTMLLIElement>;
 }) {
   const g = GRADES[row.grade];
-  const behind = above && !gapBroken ? above.score - row.score : null;
+  const behind = above ? above.score - row.score : null;
   return (
     <li
       ref={ref}
+      data-flip={row.id}
       className={cn(
         "flex items-center gap-3 border-b border-line py-2.5 transition-colors lg:px-5",
         row.isMe
@@ -300,18 +265,15 @@ function Row({
       <span className="flex min-w-0 flex-1 flex-col">
         <span className="flex items-center gap-1.5 text-[15px] font-bold">
           <span className="truncate">{row.isMe ? "You" : row.name}</span>
-          <Streak days={row.streak} />
         </span>
         <span className="flex items-center gap-[5px] truncate text-[13px] text-mist-300">
           <span className="size-[7px] flex-none rounded-full" style={{ background: g.color }} />
-          {g.label} · {row.dept} · {row.hostel}
+          {g.label} · {row.department} · {row.hostel}
         </span>
       </span>
       <span className="flex flex-none flex-col items-end">
-        <span className="font-display text-[17px] font-extrabold">{row.score.toLocaleString("en-US")}</span>
-        {behind !== null && behind > 0 && (
-          <span className="text-[11px] text-mist-500">−{behind.toLocaleString("en-US")}</span>
-        )}
+        <span className="font-display text-[17px] font-extrabold">{fmt(row.score)}</span>
+        {behind !== null && behind > 0 && <span className="text-[11px] text-mist-500">−{fmt(behind)}</span>}
       </span>
     </li>
   );
@@ -363,9 +325,8 @@ function Podium({ rows }: { rows: Ranked[] }) {
                 <span className="truncate text-[11px] text-mist-300 lg:text-[13px]">{row.hostel}</span>
               </span>
               <span className="font-display text-[17px] font-extrabold lg:text-xl" style={{ color: tone }}>
-                <CountUp value={row.score} />
+                {fmt(row.score)}
               </span>
-              <Streak days={row.streak} />
             </div>
             <div
               className={cn(
@@ -400,17 +361,12 @@ function Standing({ mine, rival, scoped }: { mine: Ranked; rival?: Ranked; scope
           <span className="flex items-center gap-1.5 whitespace-nowrap text-[15px] font-bold">
             <span className="size-2 flex-none rounded-full" style={{ background: g.color }} />
             {g.label}
-            <span className="font-display font-extrabold">· {mine.score.toLocaleString("en-US")} CE</span>
+            <span className="font-display font-extrabold">· {fmt(mine.score)} CE</span>
           </span>
         </div>
         <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:flex-col sm:items-end sm:gap-1">
           <span className="flex items-center gap-1 whitespace-nowrap rounded-full bg-jade-500/15 px-2 py-0.5 text-[13px] font-bold text-jade-500">
-            <ArrowUp className="size-3.5" aria-hidden />
-            {me.weekMove} this week
-          </span>
-          <span className="flex items-center gap-1 whitespace-nowrap text-[13px] font-bold text-ember-500">
-            <Flame className="flame size-4" aria-hidden />
-            {me.streak}-day streak
+            <ArrowUp className="size-3.5" aria-hidden />+{fmt(mine.weekGain)} CE this week
           </span>
         </div>
       </div>
@@ -422,11 +378,11 @@ function Standing({ mine, rival, scoped }: { mine: Ranked; rival?: Ranked; scope
               <Swords className="size-4 text-cursed-300" aria-hidden />
               Rival: <strong className="text-mist-100">{rival.name}</strong>
             </span>
-            <span className="font-display font-extrabold text-cursed-300">{gap.toLocaleString("en-US")} CE to pass</span>
+            <span className="font-display font-extrabold text-cursed-300">{fmt(gap)} CE to pass</span>
           </div>
           <div className="h-2.5 overflow-hidden rounded-full bg-night-700">
             <div
-              className="gauge-fill h-full rounded-full bg-gradient-to-r from-azure-500 to-cursed-500 shadow-[0_0_12px_rgba(61,139,255,0.8)]"
+              className="h-full rounded-full bg-gradient-to-r from-azure-500 to-cursed-500 shadow-[0_0_12px_rgba(61,139,255,0.8)] transition-[width] duration-700 motion-reduce:transition-none"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -434,14 +390,6 @@ function Standing({ mine, rival, scoped }: { mine: Ranked; rival?: Ranked; scope
       ) : (
         <p className="text-[13px] text-mist-300">Nobody above you here. Hold the line.</p>
       )}
-
-      <div className="flex items-center gap-2.5 rounded border border-dashed border-gold-400/50 bg-gold-400/10 px-3 py-2 text-[13px]">
-        <Target className="size-4 flex-none text-gold-400" aria-hidden />
-        <span>
-          <strong>Weekly bounty:</strong> climb one rank before Sunday for{" "}
-          <strong className="text-gold-400">+50 CE</strong>.
-        </span>
-      </div>
     </section>
   );
 }
