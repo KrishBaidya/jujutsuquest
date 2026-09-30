@@ -34,8 +34,8 @@ export default function OnboardingPage() {
           <p className="text-[15px] text-mist-300">Every mission you complete feeds your energy.</p>
         </div>
         <div className="relative mt-2 w-full">
-          <div className="absolute -inset-6 bg-[radial-gradient(ellipse_at_center,rgba(108,180,255,0.28),transparent_68%)]" />
-          <div className="paper relative flex flex-col gap-4 rounded px-[22px] py-6 shadow-[inset_0_0_0_1px_#E0CFA6,inset_0_0_0_6px_#F2E6CB,inset_0_0_0_7px_#5B3A22]">
+          <div className="absolute -inset-6 bg-[radial-gradient(ellipse_at_center,rgba(143,163,184,0.28),transparent_68%)]" />
+          <div className="paper relative flex flex-col gap-4 rounded px-[22px] py-6 shadow-[inset_0_0_0_1px_#DDD5C3,inset_0_0_0_6px_#EFE9DC,inset_0_0_0_7px_#4A3426]">
             <div className="flex items-start justify-between">
               <div className="flex flex-col gap-0.5">
                 <span className="text-[13px] text-sumi-600">Sorcerer rank</span>
@@ -97,7 +97,7 @@ export default function OnboardingPage() {
       }}
     >
       <div className="relative flex h-[150px] items-center lg:col-start-1 lg:row-start-1 lg:h-[220px]">
-        <div className="absolute -left-5 top-0 h-40 w-[180px] bg-[radial-gradient(circle,rgba(122,92,255,0.35),transparent_65%)]" />
+        <div className="absolute -left-5 top-0 h-40 w-[180px] bg-[radial-gradient(circle,rgba(61,139,255,0.35),transparent_65%)]" />
         <Kanji className="brush float relative text-[132px] leading-none lg:text-[220px]">呪</Kanji>
       </div>
       <div className="flex flex-col gap-2 lg:col-start-1 lg:row-start-2 lg:self-start">

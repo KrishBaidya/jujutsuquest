@@ -121,7 +121,7 @@ function Scanner({
         ].map((c) => (
           <span key={c} className={cn("absolute size-11 border-cursed-300", c)} />
         ))}
-        <span className="scan-sweep absolute inset-x-3.5 top-28 h-0.5 bg-cursed-300 shadow-[0_0_16px_4px_rgba(122,92,255,0.7)]" />
+        <span className="scan-sweep absolute inset-x-3.5 top-28 h-0.5 bg-cursed-300 shadow-[0_0_16px_4px_rgba(61,139,255,0.7)]" />
       </button>
 
       <div className="mt-auto flex flex-col items-center gap-2 bg-gradient-to-b from-transparent via-night-950 to-night-950 px-6 pb-10 pt-24 text-center">
@@ -177,10 +177,10 @@ function Reading({ onDone }: { onDone: () => void }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8 bg-night-950 px-8 pb-16" role="status" aria-live="polite">
       <div className="relative">
-        <div className="absolute -inset-[30px] bg-[radial-gradient(circle,rgba(122,92,255,0.3),transparent_70%)]" />
+        <div className="absolute -inset-[30px] bg-[radial-gradient(circle,rgba(61,139,255,0.3),transparent_70%)]" />
         <div
           className="relative rounded-[10px] p-1"
-          style={{ background: `conic-gradient(from 0deg, #B9A6FF 0 ${pct * 100}%, #262046 ${pct * 100}% 100%)` }}
+          style={{ background: `conic-gradient(from 0deg, #9CC4FF 0 ${pct * 100}%, #2A2E38 ${pct * 100}% 100%)` }}
         >
           <div className="placeholder-photo-dark flex h-80 w-[252px] items-end rounded-md p-3">
             <span className="font-mono text-[13px] text-mist-300">captured photo</span>
@@ -209,7 +209,7 @@ function Rejected({ title, retries, onRetake }: { title: string; retries: number
           <h1 className="font-display text-[28px] font-extrabold leading-[1.2]">Not accepted yet</h1>
         </div>
       </div>
-      <div className="flex flex-col gap-3 rounded bg-washi-100 p-[18px] text-sumi-900 shadow-[inset_0_0_0_1px_#E0CFA6]">
+      <div className="flex flex-col gap-3 rounded bg-washi-100 p-[18px] text-sumi-900 shadow-[inset_0_0_0_1px_#DDD5C3]">
         <span className="flex items-center gap-1.5 text-[13px] text-sumi-600">
           <Info className="size-3.5" aria-hidden />
           What Jev saw
@@ -250,7 +250,7 @@ function Seal({ quest, earned }: { quest: QuestLite; earned: number }) {
     <div className="flex flex-1 flex-col gap-[26px] bg-night-950 px-[30px] pb-9 pt-7">
       <div className="relative">
         <div className="rod-lg" />
-        <div className="paper flex flex-col gap-2.5 px-5 pb-[70px] pt-[22px] shadow-[inset_0_0_0_1px_#E0CFA6]">
+        <div className="paper flex flex-col gap-2.5 px-5 pb-[70px] pt-[22px] shadow-[inset_0_0_0_1px_#DDD5C3]">
           <span className="text-[13px] text-sumi-600">
             Mission complete · {cat.k} {cat.label}
           </span>
@@ -262,7 +262,7 @@ function Seal({ quest, earned }: { quest: QuestLite; earned: number }) {
         </div>
         <div className="rod-lg" />
         <div className="absolute bottom-1 right-0 size-[170px] rounded-full border-[3px] border-seal-600/30" />
-        <div className="stamp-in absolute bottom-[34px] right-[30px] flex size-[110px] items-center justify-center rounded-[14px] bg-seal-600 shadow-[inset_0_0_0_5px_#C22E26,inset_0_0_0_7px_#F2E6CB,0_4px_0_rgba(0,0,0,0.15)]">
+        <div className="stamp-in absolute bottom-[34px] right-[30px] flex size-[110px] items-center justify-center rounded-[14px] bg-seal-600 shadow-[inset_0_0_0_5px_#D8392B,inset_0_0_0_7px_#EFE9DC,0_4px_0_rgba(0,0,0,0.15)]">
           <Kanji className="text-[64px] leading-none text-washi-100">祓</Kanji>
         </div>
       </div>
@@ -302,13 +302,13 @@ function BlackFlash({ base, total, onNext }: { base: number; total: number; onNe
       className="flash-in relative flex min-h-dvh flex-1 flex-col items-center justify-center gap-3.5 overflow-hidden bg-black pt-[60px] text-center lg:min-h-[720px]"
       aria-label="Black Flash. Tap to continue"
     >
-      <svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" className="shake absolute inset-0 size-full [filter:drop-shadow(0_0_8px_#E0202A)_drop-shadow(0_0_20px_rgba(224,32,42,0.6))]" aria-hidden>
-        <polyline className="bolt" points="250,0 210,120 262,150 190,300 236,318 170,440" fill="none" stroke="#E0202A" strokeWidth="5" />
-        <polyline className="bolt" style={{ "--i": 1 } as React.CSSProperties} points="40,560 110,520 90,600 180,560 160,640" fill="none" stroke="#E0202A" strokeWidth="3" />
-        <polyline className="bolt" style={{ "--i": 2 } as React.CSSProperties} points="390,600 320,650 350,680 270,760 300,780 250,844" fill="none" stroke="#ff4a50" strokeWidth="4" />
+      <svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" className="shake absolute inset-0 size-full [filter:drop-shadow(0_0_8px_#E5322D)_drop-shadow(0_0_20px_rgba(229,50,45,0.6))]" aria-hidden>
+        <polyline className="bolt" points="250,0 210,120 262,150 190,300 236,318 170,440" fill="none" stroke="#E5322D" strokeWidth="5" />
+        <polyline className="bolt" style={{ "--i": 1 } as React.CSSProperties} points="40,560 110,520 90,600 180,560 160,640" fill="none" stroke="#E5322D" strokeWidth="3" />
+        <polyline className="bolt" style={{ "--i": 2 } as React.CSSProperties} points="390,600 320,650 350,680 270,760 300,780 250,844" fill="none" stroke="#ff5a4f" strokeWidth="4" />
       </svg>
       <Kanji className="relative text-[30px] leading-none tracking-[0.2em]">黒閃</Kanji>
-      <span className="relative font-display text-[60px] font-extrabold leading-none text-flash-500 [text-shadow:0_0_24px_rgba(224,32,42,0.8)]">
+      <span className="relative font-display text-[60px] font-extrabold leading-none text-flash-500 [text-shadow:0_0_24px_rgba(229,50,45,0.8)]">
         Black Flash
       </span>
       <div className="relative mt-7 flex flex-col items-center gap-1.5 bg-black px-4 py-2">
@@ -324,15 +324,15 @@ function BlackFlash({ base, total, onNext }: { base: number; total: number; onNe
 
 function Promotion() {
   return (
-    <div className="relative flex min-h-dvh lg:min-h-[720px] flex-1 flex-col overflow-hidden bg-[#07050F]">
-      <div className="absolute left-1/2 top-[360px] size-[420px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(122,92,255,0.32),transparent_62%)]" />
+    <div className="relative flex min-h-dvh lg:min-h-[720px] flex-1 flex-col overflow-hidden bg-[#060709]">
+      <div className="absolute left-1/2 top-[360px] size-[420px] -translate-x-1/2 bg-[radial-gradient(circle,rgba(61,139,255,0.32),transparent_62%)]" />
       <div className="relative flex flex-1 flex-col items-center gap-3.5 px-8 pb-9 pt-10 text-center">
         <span className="text-[15px] text-mist-300">Promotion trial passed</span>
-        <span className="rise-in relative font-display text-[26px] font-extrabold text-transparent line-through decoration-ember-500/60 [background:linear-gradient(90deg,rgba(255,122,47,0.2),#FF7A2F_45%,rgba(166,159,194,0.15))] [background-clip:text]">
+        <span className="rise-in relative font-display text-[26px] font-extrabold text-transparent line-through decoration-ember-500/60 [background:linear-gradient(90deg,rgba(240,129,58,0.2),#FF7A2F_45%,rgba(163,166,174,0.15))] [background-clip:text]">
           Grade 3
         </span>
         <span className="brush stamp-in font-display text-[64px] font-extrabold leading-none">Grade 2</span>
-        <div className="paper float relative mt-5 flex h-[236px] w-32 flex-col items-center gap-2.5 rounded-[3px] px-0 py-[22px] shadow-[inset_0_0_0_5px_#F2E6CB,inset_0_0_0_7px_#5B3A22,0_0_40px_rgba(122,92,255,0.5)]">
+        <div className="paper float relative mt-5 flex h-[236px] w-32 flex-col items-center gap-2.5 rounded-[3px] px-0 py-[22px] shadow-[inset_0_0_0_5px_#EFE9DC,inset_0_0_0_7px_#4A3426,0_0_40px_rgba(61,139,255,0.5)]">
           <span className="flex size-10 items-center justify-center rounded-full bg-seal-600 font-display text-xl font-extrabold text-washi-100">
             昇
           </span>

@@ -3,40 +3,40 @@
     height: 8px;
     margin: 0 -6px;
     border-radius: 4px;
-    background: linear-gradient(#80583a, #5b3a22 55%, #3b2515);
+    background: linear-gradient(#6b4e3a, #4a3426 55%, #2e2018);
   }
   .rod-lg {
     height: 10px;
     margin: 0 -8px;
     border-radius: 5px;
-    background: linear-gradient(#80583a, #5b3a22 55%, #3b2515);
+    background: linear-gradient(#6b4e3a, #4a3426 55%, #2e2018);
   }
   .rod-burn {
-    background: linear-gradient(#80583a, #5b3a22 55%, #2e1c10);
+    background: linear-gradient(#6b4e3a, #4a3426 55%, #241810);
   }
   .rod-sealed {
-    background: linear-gradient(#6a4a32, #4a3020 55%, #2e1c10);
+    background: linear-gradient(#5a4334, #3d2b20 55%, #241810);
   }
   .sealed-paper {
-    background: repeating-linear-gradient(135deg, #e0cfa6 0 10px, #d9c79c 10px 20px);
-    box-shadow: inset 0 0 0 1px #cdbb8f;
+    background: repeating-linear-gradient(135deg, #ddd5c3 0 10px, #d5ccb8 10px 20px);
+    box-shadow: inset 0 0 0 1px #c4baa3;
   }
   .placeholder-photo {
-    background: repeating-linear-gradient(135deg, #e0cfa6 0 8px, #d6c49b 8px 16px);
+    background: repeating-linear-gradient(135deg, #ddd5c3 0 8px, #cfc6b1 8px 16px);
   }
   .placeholder-photo-dark {
-    background: repeating-linear-gradient(135deg, #262046 0 10px, #1f1a3b 10px 20px);
+    background: repeating-linear-gradient(135deg, #2A2E38 0 10px, #22252d 10px 20px);
   }
   .map-tiles {
-    background-color: #1f1a38;
+    background-color: #1a1d24;
     background-image:
-      repeating-linear-gradient(28deg, transparent 0 58px, #342d5c 58px 62px),
-      repeating-linear-gradient(-62deg, transparent 0 84px, #342d5c 84px 88px);
+      repeating-linear-gradient(28deg, transparent 0 58px, #2e323d 58px 62px),
+      repeating-linear-gradient(-62deg, transparent 0 84px, #2e323d 84px 88px);
   }
   .ink-divider {
     height: 3px;
     border-radius: 50%;
-    background: linear-gradient(90deg, transparent, #2b2117 10%, #2b2117 75%, transparent);
+    background: linear-gradient(90deg, transparent, #1e1b17 10%, #1e1b17 75%, transparent);
     opacity: 0.4;
   }
   .stamp-in {

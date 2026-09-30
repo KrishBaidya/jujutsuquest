@@ -48,7 +48,7 @@ export default function ReviewQueuePage() {
 
       {done ? (
         <div className="rise-in mx-auto flex w-full max-w-[420px] flex-1 flex-col items-center justify-center gap-3 px-8 pb-24 text-center lg:py-24">
-          <span className="stamp-in flex size-24 items-center justify-center rounded-[14px] bg-seal-600 shadow-[inset_0_0_0_5px_#C22E26,inset_0_0_0_7px_#F2E6CB]">
+          <span className="stamp-in flex size-24 items-center justify-center rounded-[14px] bg-seal-600 shadow-[inset_0_0_0_5px_#D8392B,inset_0_0_0_7px_#EFE9DC]">
             <Kanji className="text-[56px] leading-none text-washi-100">祓</Kanji>
           </span>
           <p className="mt-2 font-display text-2xl font-extrabold">Queue cleared</p>
@@ -67,7 +67,7 @@ export default function ReviewQueuePage() {
                 aria-current={i === index ? "step" : undefined}
                 className={cn(
                   "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13px]",
-                  i === index && "bg-night-800 shadow-[inset_0_0_0_1px_#7A5CFF]",
+                  i === index && "bg-night-800 shadow-[inset_0_0_0_1px_#3D8BFF]",
                   i < index && "text-mist-500",
                 )}
               >
@@ -92,7 +92,7 @@ export default function ReviewQueuePage() {
 
           <article
             key={index}
-            className="rise-in flex flex-col gap-3.5 rounded bg-washi-100 p-4 text-sumi-900 shadow-[inset_0_0_0_1px_#E0CFA6] lg:p-6"
+            className="rise-in flex flex-col gap-3.5 rounded bg-washi-100 p-4 text-sumi-900 shadow-[inset_0_0_0_1px_#DDD5C3] lg:p-6"
           >
             <div className="flex flex-col">
               <h2 className="font-display text-[17px] font-extrabold leading-[1.3] lg:text-2xl">{item.title}</h2>
@@ -118,7 +118,7 @@ export default function ReviewQueuePage() {
                 <span className="font-bold">Jev&apos;s confidence</span>
                 <span className="font-display text-[15px] font-extrabold">{item.conf}%</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-washi-500 shadow-[inset_0_0_0_1px_#cdbb8f]">
+              <div className="h-2 overflow-hidden rounded-full bg-washi-500 shadow-[inset_0_0_0_1px_#c4baa3]">
                 <div className="gauge-fill h-full bg-cursed-500" style={{ width: `${item.conf}%` }} />
               </div>
               <span className="text-[13px] text-sumi-600">{item.note}</span>

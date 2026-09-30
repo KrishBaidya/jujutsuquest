@@ -93,8 +93,8 @@ export default function CreateQuestPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="relative h-[60px] w-[84px] flex-none rounded bg-[#1f1a38] bg-[repeating-linear-gradient(28deg,transparent_0_14px,#342d5c_14px_16px)]">
-            <span className="absolute left-9 top-[22px] size-3 rounded-full bg-cursed-300 shadow-[0_0_0_3px_#110D22]" />
+          <div className="relative h-[60px] w-[84px] flex-none rounded bg-[#1a1d24] bg-[repeating-linear-gradient(28deg,transparent_0_14px,#342d5c_14px_16px)]">
+            <span className="absolute left-9 top-[22px] size-3 rounded-full bg-cursed-300 shadow-[0_0_0_3px_#14161B]" />
           </div>
           <div className="flex flex-col">
             <span className="text-[13px] text-mist-300">Location</span>

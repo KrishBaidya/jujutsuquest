@@ -132,35 +132,35 @@
 }
 /* Cursed Mission Board — Ink and Talisman tokens */
 @theme {
-  --color-night-950: #0c0919;
-  --color-night-900: #110d22;
-  --color-night-800: #1a1531;
-  --color-night-700: #262046;
-  --color-night-600: #3a3264;
-  --color-line: #1f1a3b;
-  --color-mist-100: #eee8fa;
-  --color-mist-300: #a69fc2;
-  --color-mist-500: #6e6790;
-  --color-washi-100: #f2e6cb;
-  --color-washi-300: #e0cfa6;
-  --color-washi-500: #d6c49b;
-  --color-sumi-900: #2b2117;
-  --color-sumi-600: #6e5c44;
-  --color-wood-700: #5b3a22;
-  --color-cursed-500: #7a5cff;
-  --color-cursed-300: #b9a6ff;
-  --color-azure-500: #4c9bff;
-  --color-seal-600: #c22e26;
-  --color-flash-500: #e0202a;
-  --color-ember-500: #ff7a2f;
-  --color-gold-400: #d9a441;
-  --color-jade-500: #2fb38a;
-  --color-grade-4: #6cb4ff;
-  --color-grade-3: #5b8cff;
-  --color-grade-2: #7a5cff;
-  --color-grade-semi-1: #a64de0;
-  --color-grade-1: #d6409f;
-  --color-grade-special: #e0202a;
+  --color-night-950: #0b0c0f;
+  --color-night-900: #14161b;
+  --color-night-800: #1d2027;
+  --color-night-700: #2A2E38;
+  --color-night-600: #3b404d;
+  --color-line: #22252d;
+  --color-mist-100: #eceae4;
+  --color-mist-300: #a3a6ae;
+  --color-mist-500: #6b6f79;
+  --color-washi-100: #efe9dc;
+  --color-washi-300: #ddd5c3;
+  --color-washi-500: #cfc6b1;
+  --color-sumi-900: #1e1b17;
+  --color-sumi-600: #625a4e;
+  --color-wood-700: #4a3426;
+  --color-cursed-500: #3d8bff;
+  --color-cursed-300: #9cc4ff;
+  --color-azure-500: #5fd0e6;
+  --color-seal-600: #d8392b;
+  --color-flash-500: #e5322d;
+  --color-ember-500: #f0813a;
+  --color-gold-400: #e0b04a;
+  --color-jade-500: #3fb68b;
+  --color-grade-4: #8fa3b8;
+  --color-grade-3: #4fa3ff;
+  --color-grade-2: #3d6bff;
+  --color-grade-semi-1: #8a5bff;
+  --color-grade-1: #e0508a;
+  --color-grade-special: #d8392b;
 
   --font-display: var(--font-shippori), serif;
   --font-body: var(--font-zen), sans-serif;
@@ -180,13 +180,13 @@
   .bg-grid-night {
     background-color: var(--color-night-900);
     background-image:
-      linear-gradient(rgba(238, 232, 250, 0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(238, 232, 250, 0.025) 1px, transparent 1px);
+      linear-gradient(rgba(236, 234, 228, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236, 234, 228, 0.025) 1px, transparent 1px);
     background-size: 24px 24px;
   }
   .paper {
     background-color: var(--color-washi-100);
-    background-image: radial-gradient(rgba(110, 92, 68, 0.07) 1px, transparent 1.2px);
+    background-image: radial-gradient(rgba(98, 90, 78, 0.07) 1px, transparent 1.2px);
     background-size: 4px 4px;
     color: var(--color-sumi-900);
   }
