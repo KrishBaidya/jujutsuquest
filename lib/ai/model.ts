@@ -12,6 +12,9 @@ const google = createGoogleGenerativeAI({ apiKey });
 
 export const geminiVision = google(process.env.GEMINI_MODEL ?? "gemini-2.5-flash");
 
+/** Image model that redraws residue photos in the JJK style (image in, image out). */
+export const geminiImage = google.image(process.env.GEMINI_IMAGE_MODEL ?? "gemini-2.5-flash-image");
+
 /** False when no Gemini key is set; callers must fall back to manual review. */
 export const hasGemini = () => Boolean(apiKey);
 

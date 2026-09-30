@@ -333,6 +333,10 @@
   0% { transform: translateY(0); }
   100% { transform: translateY(100%); }
 }
+@keyframes sweep {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(300%); }
+}
 
 /* ── Route transitions: ink cut in, fade out ── */
 ::view-transition-old(.ink-cut) {

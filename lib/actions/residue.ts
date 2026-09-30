@@ -6,7 +6,8 @@ import { z } from "zod";
 import { db, schema } from "@/lib/db";
 import { requireUser } from "@/lib/session";
 import { parseDataUrl, uploadPhoto } from "@/lib/storage";
-import type { LeaveResidue, ToggleResidueLike } from "./types";
+import { conjure } from "@/lib/ai/conjure";
+import type { ConjureResidue, LeaveResidue, ToggleResidueLike } from "./types";
 
 const { archivePosts, archiveLikes, locations, userBadges } = schema;
 
@@ -46,6 +47,54 @@ export const leaveResidue: LeaveResidue = async (input) => {
   revalidatePath(`/places/${locationId}`);
   revalidatePath("/map");
   return { ok: true, data: { postId: post.id } };
+};
+
+const conjureSchema = z.object({
+  photoDataUrl: z.string().min(32),
+  width: z.number().int().min(1).max(10_000),
+  height: z.number().int().min(1).max(10_000),
+  locationId: z.string().min(1).max(64),
+});
+
+// Each redraw is a paid Gemini call. A soft per-user cap, per server instance.
+const CONJURE_LIMIT = 12;
+const CONJURE_WINDOW_MS = 60 * 60 * 1000;
+const conjureLog = new Map<string, number[]>();
+
+function allowConjure(userId: string) {
+  const now = Date.now();
+  const recent = (conjureLog.get(userId) ?? []).filter((t) => now - t < CONJURE_WINDOW_MS);
+  if (recent.length >= CONJURE_LIMIT) return false;
+  recent.push(now);
+  conjureLog.set(userId, recent);
+  return true;
+}
+
+const CONJURE_ERRORS = {
+  unavailable: "The AI redraw is not set up on this server.",
+  refused: "Gemini would not redraw this photo. Try a different shot.",
+  failed: "The redraw did not finish. Try again in a moment.",
+} as const;
+
+/** Redraws a photo in the JJK anime style. Nothing is saved until the student posts it. */
+export const conjureResidue: ConjureResidue = async (input) => {
+  const user = await requireUser();
+  const parsed = conjureSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "That photo is not valid." };
+  const photo = parseDataUrl(parsed.data.photoDataUrl);
+  if (!photo) return { ok: false, error: "The photo could not be read. Pick it again." };
+
+  const [loc] = await db
+    .select({ name: locations.name })
+    .from(locations)
+    .where(eq(locations.id, parsed.data.locationId))
+    .limit(1);
+  if (!loc) return { ok: false, error: "That location does not exist." };
+  if (!allowConjure(user.id)) return { ok: false, error: "You have redrawn a lot this hour. Rest your cursed energy and try later." };
+
+  const res = await conjure({ bytes: photo.bytes, width: parsed.data.width, height: parsed.data.height, placeName: loc.name });
+  if (!res.ok) return { ok: false, error: CONJURE_ERRORS[res.reason] };
+  return { ok: true, data: { imageDataUrl: `data:${res.mediaType};base64,${res.base64}` } };
 };
 
 export const toggleResidueLike: ToggleResidueLike = async (postId) => {

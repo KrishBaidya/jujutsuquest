@@ -5,6 +5,8 @@ import { Screen } from "@/components/ui";
 import { ResidueComposer } from "@/components/place/residue-composer";
 
 export const metadata: Metadata = { title: "Leave residue" };
+// Server actions on this page include the Gemini redraw, which can take a while.
+export const maxDuration = 90;
 
 export default async function LeaveResiduePage({ params }: PageProps<"/places/[id]/residue">) {
   const { id } = await params;
