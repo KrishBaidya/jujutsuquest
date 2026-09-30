@@ -3,7 +3,7 @@
 // Run with: npm run db:seed
 import { createHash } from "node:crypto";
 import { config } from "dotenv";
-import { Pool } from "@neondatabase/serverless";
+import { neon, neonConfig } from "@neondatabase/serverless";
 
 config({ path: ".env.local" });
 
@@ -85,10 +85,19 @@ const badges = [
   ["grade-2", "Grade 2", "弐", "Reach Grade 2.", 5],
   ["grade-1", "Grade 1", "壱", "Reach Grade 1.", 6],
   ["seat-holder", "Seat holder", "特", "Hold a Special Grade seat.", 7],
-  ["archivist", "Archivist", "蔵", "Share a photo in the Cursed Archive.", 8],
+  ["archivist", "Residue", "痕", "Leave a photo at a campus location.", 8],
 ] as const;
 
-const departments = ["Finance", "Analytics", "Marketing", "Operations", "HR", "Insurance"];
+// [code, name] must match the course table in lib/uid.ts.
+const courses: [string, string][] = [
+  ["BCS", "B.E. Computer Science"],
+  ["BAI", "B.E. CSE (AI & ML)"],
+  ["BBA", "Bachelor of Business Admin."],
+  ["BEC", "B.E. Electronics & Comm."],
+  ["MBA", "Master of Business Admin."],
+  ["BCA", "Bachelor of Computer Applications"],
+];
+const intakes = ["25", "24", "23", "22"];
 // [name, term CE]. The first six clear the Grade 1 bar, so four hold seats and two chase.
 const students: [string, number][] = [
   ["Diya Kapoor", 9840], ["Rohan Iyer", 8215], ["Meher Sandhu", 6930], ["Kabir Das", 6410],
@@ -101,9 +110,11 @@ const students: [string, number][] = [
 ];
 
 async function main() {
-  const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+  const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set");
-  const pool = new Pool({ connectionString: url });
+  if (process.env.NEON_FETCH_ENDPOINT) neonConfig.fetchEndpoint = process.env.NEON_FETCH_ENDPOINT;
+  const sql = neon(url);
+  const pool = { query: async (text: string, params: unknown[] = []) => ({ rows: (await sql.query(text, params)) as Record<string, unknown>[] }) };
 
   for (const h of hostels) {
     await pool.query(
@@ -149,12 +160,14 @@ async function main() {
 
   let created = 0;
   for (const [i, [name, ce]] of students.entries()) {
-    const uid = `DEMO-${String(i + 1).padStart(4, "0")}`;
+    // 25BCS10001 style: intake year, course code, five-digit number.
+    const [course, department] = courses[i % courses.length];
+    const uid = `${intakes[i % intakes.length]}${course}${10001 + i}`;
     const { rows } = await pool.query(
       `insert into users (uid, name, department, hostel_id, role)
        values ($1,$2,$3,$4,$5) on conflict (uid) do nothing returning id`,
-      [uid, name, departments[i % departments.length], hostels[i % hostels.length][0],
-        name === "Aarav Mehta" ? "reviewer" : "student"],
+      [uid, name, department, hostels[i % hostels.length][0],
+        name === "Karan Mehra" ? "reviewer" : "student"],
     );
     if (!rows[0]) continue; // already seeded: leave their ledger alone
     created++;
@@ -168,12 +181,31 @@ async function main() {
     );
   }
 
+  // Demo residue so each gallery has something in it. Keys starting with "/" are
+  // served from /public instead of the bucket.
+  const { rows: existingPosts } = await pool.query(`select count(*)::int as n from archive_posts`);
+  if (Number(existingPosts[0].n) === 0) {
+    const { rows: authors } = await pool.query(`select id from users where role = 'student' order by uid limit 6`);
+    const demo: [string, string, string][] = [
+      ["fountain-park", "/locations/fountain-plaza.jpg", "The sky went red over the fountain again."],
+      ["a3-parking", "/locations/fire-station.jpg", "Something was waiting by the A3 bays."],
+      ["b1-park", "/locations/night-cafe.jpg", "Late chai, quiet curses."],
+      ["fountain-park", "/locations/night-cafe.jpg", "Walked the long way round."],
+    ];
+    for (const [i, [locationId, key, caption]] of demo.entries()) {
+      await pool.query(
+        `insert into archive_posts (user_id, location_id, image_key, caption, created_at)
+         values ($1, $2, $3, $4, now() - make_interval(hours => $5))`,
+        [authors[i % authors.length].id, locationId, key, caption, (i + 1) * 5],
+      );
+    }
+  }
+
   const { rows: counts } = await pool.query(
     `select (select count(*) from users) users, (select count(*) from quests) quests,
             (select count(*) from locations) locations, (select count(*) from ce_ledger) ledger`,
   );
   console.log("seeded", { created, ...counts[0] });
-  await pool.end();
 }
 
 main().catch((e) => {

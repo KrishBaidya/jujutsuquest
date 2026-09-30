@@ -2,24 +2,32 @@
 
 import { useEffect, useState } from "react";
 
-/** "5h 12m left", "2d 3h left" or "Expired". Re-ticks every 30 s. */
-export function formatLeft(ms: number) {
+function left(iso: string, now: number) {
+  const ms = new Date(iso).getTime() - now;
   if (ms <= 0) return "Expired";
-  const mins = Math.floor(ms / 60_000);
-  const d = Math.floor(mins / 1440);
-  const h = Math.floor((mins % 1440) / 60);
-  const m = mins % 60;
-  if (d > 0) return `${d}d ${h}h left`;
-  if (h > 0) return `${h}h ${m}m left`;
-  return `${Math.max(m, 1)}m left`;
+  const h = Math.floor(ms / 3_600_000);
+  const m = Math.floor((ms % 3_600_000) / 60_000);
+  if (h >= 48) return `${Math.floor(h / 24)}d left`;
+  if (h >= 1) return `${h}h ${String(m).padStart(2, "0")}m`;
+  const s = Math.floor((ms % 60_000) / 1000);
+  return `${m}m ${String(s).padStart(2, "0")}s`;
 }
 
-export function Countdown({ expiresAt }: { expiresAt: string }) {
-  const [now, setNow] = useState(() => Date.now());
+/** Ticking time-left label. Renders nothing until mounted so server and client agree. */
+export function Countdown({ to, className }: { to: string; className?: string }) {
+  const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 30_000);
-    return () => clearInterval(t);
+    const tick = () => setNow(Date.now());
+    const first = setTimeout(tick, 0);
+    const id = setInterval(tick, 1000);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
   }, []);
-  // The server and client clocks differ by a few ms; the text only changes by the minute.
-  return <span suppressHydrationWarning>{formatLeft(new Date(expiresAt).getTime() - now)}</span>;
+  return (
+    <time dateTime={to} className={className} suppressHydrationWarning>
+      {now === null ? " " : left(to, now)}
+    </time>
+  );
 }

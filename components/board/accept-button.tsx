@@ -1,79 +1,37 @@
 "use client";
 
-import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2 } from "lucide-react";
+import { useState, useTransition } from "react";
 import { acceptQuest } from "@/lib/actions/quests";
-import { Action } from "@/components/app/primitives";
-import type { MissionStatus } from "@/lib/db/schema";
+import { btnClass } from "@/components/ui";
 
-/** Primary button on the quest page: accept, continue, or the sealed state. */
-export function AcceptButton({
-  questId,
-  status,
-  className,
-}: {
-  questId: string;
-  status: MissionStatus | null;
-  className?: string;
-}) {
+/** Takes the vow (accepts the mission), then refreshes the page into its accepted state. */
+export function AcceptButton({ questId }: { questId: string }) {
   const router = useRouter();
-  const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
-
-  if (status === "completed") {
-    return (
-      <div
-        className={
-          "flex min-h-12 items-center justify-center gap-2 rounded-lg border border-night-700 bg-night-800 font-bold text-mist-300 " +
-          (className ?? "")
-        }
-      >
-        <CheckCircle2 className="size-5" aria-hidden />
-        Sealed · mission complete
-      </div>
-    );
-  }
-  if (status === "in_review") {
-    return (
-      <div
-        className={
-          "flex min-h-12 items-center justify-center rounded-lg border border-night-700 bg-night-800 font-bold text-mist-300 " +
-          (className ?? "")
-        }
-      >
-        In review
-      </div>
-    );
-  }
-  if (status === "accepted" || status === "rejected") {
-    return (
-      <Action href={`/verify/${questId}`} className={className}>
-        Continue to verify
-      </Action>
-    );
-  }
-
+  const [pending, start] = useTransition();
   return (
-    <div className="flex flex-1 flex-col gap-1.5">
-      <Action
-        className={className}
+    <div className="flex flex-col gap-2">
+      <button
+        type="button"
         disabled={pending}
         onClick={() =>
           start(async () => {
             setError(null);
             const res = await acceptQuest(questId);
-            if (res.ok) router.push(`/verify/${questId}`);
-            else setError(res.error);
+            if (!res.ok) setError(res.error);
+            else router.refresh();
           })
         }
+        className={btnClass("blood", "lg", "w-full")}
       >
-        {pending ? "Accepting..." : "Accept mission"}
-      </Action>
+        <span className="kanji text-[20px]">誓</span>
+        {pending ? "Binding…" : "Take the vow"}
+      </button>
       {error && (
-        <span role="alert" className="text-center text-[13px] text-ember-500">
+        <p role="alert" className="text-[13px] text-blood-bright">
           {error}
-        </span>
+        </p>
       )}
     </div>
   );

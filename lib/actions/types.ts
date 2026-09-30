@@ -8,7 +8,8 @@ export type ActionResult<T = undefined> =
   | { ok: false; error: string };
 
 // ---- lib/actions/auth.ts ----
-export type SignInInput = { name: string; uid: string; department: string; hostelId: string };
+/** `hostelId` is only needed the first time a UID signs in. */
+export type SignInInput = { name: string; uid: string; hostelId: string };
 export type SignIn = (input: SignInInput) => Promise<ActionResult<{ isNew: boolean }>>;
 export type SignOut = () => Promise<void>;
 
@@ -54,10 +55,11 @@ export type ReviewSubmission = (
   decision: { approve: true } | { approve: false; reason: string },
 ) => Promise<ActionResult>;
 
-// ---- lib/actions/archive.ts ----
-export type ShareToArchive = (input: {
+// ---- lib/actions/residue.ts ----
+/** Residue: a student photo left at a campus location. Posted straight to the location's gallery. */
+export type LeaveResidue = (input: {
   photoDataUrl: string;
   caption: string;
-  locationId: string | null;
-}) => Promise<ActionResult<{ postId: string; status: "visible" | "in_review" }>>;
-export type ToggleArchiveLike = (postId: string) => Promise<ActionResult<{ liked: boolean; likes: number }>>;
+  locationId: string;
+}) => Promise<ActionResult<{ postId: string }>>;
+export type ToggleResidueLike = (postId: string) => Promise<ActionResult<{ liked: boolean; likes: number }>>;
