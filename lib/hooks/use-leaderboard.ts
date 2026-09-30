@@ -6,6 +6,7 @@ import type { LeaderboardPeriod, LeaderboardSnapshot } from "@/lib/queries/leade
 type Snapshots = Partial<Record<LeaderboardPeriod, LeaderboardSnapshot>>;
 
 const RECONNECT_MS = 1_000;
+const MAX_BACKOFF_MS = 15_000;
 const OFFLINE_AFTER_MS = 5_000;
 
 /**
@@ -22,6 +23,7 @@ export function useLeaderboard(initial: Snapshots, period: LeaderboardPeriod) {
     let reconnect: ReturnType<typeof setTimeout> | undefined;
     let offline: ReturnType<typeof setTimeout> | undefined;
     let disposed = false;
+    let failures = 0;
 
     const close = () => {
       clearTimeout(reconnect);
@@ -36,6 +38,7 @@ export function useLeaderboard(initial: Snapshots, period: LeaderboardPeriod) {
       const source = new EventSource(`/api/leaderboard/stream?period=${period}`);
       es = source;
       source.onopen = () => {
+        failures = 0;
         clearTimeout(offline);
         setLive(true);
       };
@@ -52,7 +55,9 @@ export function useLeaderboard(initial: Snapshots, period: LeaderboardPeriod) {
         if (es === source) es = null;
         clearTimeout(offline);
         offline = setTimeout(() => setLive(false), OFFLINE_AFTER_MS);
-        reconnect = setTimeout(open, RECONNECT_MS);
+        // Back off while the endpoint keeps failing instead of hammering it.
+        reconnect = setTimeout(open, Math.min(RECONNECT_MS * 2 ** failures, MAX_BACKOFF_MS));
+        failures += 1;
       };
     };
 

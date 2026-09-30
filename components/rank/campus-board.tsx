@@ -12,7 +12,8 @@ import { HostelDuel } from "@/components/rank/hostels";
 import { LiveBadge } from "@/components/rank/live-badge";
 import { useFlip } from "@/components/rank/use-flip";
 
-type Ranked = LeaderboardStudent & { isMe: boolean };
+/** move is dropped when a department filter is on: it is a campus-wide change. */
+type Ranked = Omit<LeaderboardStudent, "move"> & { move?: number | null; isMe: boolean };
 
 const PERIODS: { value: LeaderboardPeriod; label: string }[] = [
   { value: "week", label: "This week" },
@@ -26,7 +27,12 @@ const fmt = (n: number) => n.toLocaleString("en-US");
 function rank(snapshot: LeaderboardSnapshot, dept: string, meId: string | null): Ranked[] {
   return snapshot.students
     .filter((s) => dept === "all" || s.department === dept)
-    .map((s, i) => ({ ...s, pos: dept === "all" ? s.pos : i + 1, isMe: s.id === meId }));
+    .map((s, i) => ({
+      ...s,
+      pos: dept === "all" ? s.pos : i + 1,
+      move: dept === "all" ? s.move : undefined,
+      isMe: s.id === meId,
+    }));
 }
 
 export function CampusBoard({
@@ -91,8 +97,11 @@ export function CampusBoard({
     return () => io.disconnect();
   }, [period, activeDept, meInList, hasMe]);
 
+  // On the podium there is no list row: bring the podium back into view instead.
   const jumpToMe = () =>
-    (meRow.current ?? standing.current)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    meRow.current
+      ? meRow.current.scrollIntoView({ behavior: "smooth", block: "center" })
+      : window.scrollTo({ top: 0, behavior: "smooth" });
 
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:items-start lg:gap-10">
@@ -202,7 +211,8 @@ function Avatar({ row, size = "md" }: { row: Ranked; size?: "md" | "lg" }) {
   );
 }
 
-function Move({ move }: { move: number | null }) {
+function Move({ move }: { move: number | null | undefined }) {
+  if (move === undefined) return null;
   if (move === null)
     return (
       <span className="flex items-center gap-0.5 text-[11px] font-bold uppercase tracking-wide text-gold-400">

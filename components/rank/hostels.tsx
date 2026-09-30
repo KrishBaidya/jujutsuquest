@@ -51,8 +51,11 @@ export function HostelDuel({
   const pair = pairFor(hostels, meHostelId);
   if (!pair) return null;
   const [home, away] = pair;
-  const total = home.weekGain + away.weekGain;
-  const homePct = total > 0 ? Math.round((home.weekGain / total) * 100) : 50;
+  // adjust rows can be negative; the bar only ever shows positive gains
+  const homeGain = Math.max(home.weekGain, 0);
+  const awayGain = Math.max(away.weekGain, 0);
+  const total = homeGain + awayGain;
+  const homePct = total > 0 ? Math.round((homeGain / total) * 100) : 50;
   const lead = home.weekGain - away.weekGain;
   const sides = [home, away];
 
