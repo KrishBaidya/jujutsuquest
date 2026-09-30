@@ -26,7 +26,7 @@ export type LeaderboardStudent = {
   weekGain: number;
   /** 1-based position on the campus board for the period. */
   pos: number;
-  /** Places gained (+) or lost (-) against a week ago. null = joined this week. */
+  /** Places gained (+) or lost (-) against a week ago. null = no CE history older than a week. */
   move: number | null;
 };
 
@@ -93,7 +93,7 @@ async function load(): Promise<Raw> {
   const [students, hostels] = await Promise.all([
     sql`
       select u.id, u.name, u.department, u.hostel_id, u.ce, u.grade,
-        (u.created_at > now() - make_interval(days => ${WEEK_DAYS})) as is_new,
+        not coalesce(bool_or(l.created_at <= now() - make_interval(days => ${WEEK_DAYS})), false) as is_new,
         coalesce(sum(l.amount) filter (where l.created_at > now() - make_interval(days => ${WEEK_DAYS})), 0)::int as wk,
         coalesce(sum(l.amount) filter (where l.created_at > now() - make_interval(days => ${TERM_DAYS})), 0)::int as tm,
         coalesce(sum(l.amount) filter (
