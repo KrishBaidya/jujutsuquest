@@ -3,26 +3,30 @@ import { Camera, Flame, MapPin, Pin, QrCode, Footprints } from "lucide-react";
 import { GRADES } from "@/lib/grades";
 import type { Quest } from "@/lib/mock-data";
 import { CategoryTag, GradePill, ScrollCard } from "@/components/app/primitives";
+import { FORWARD, Morph } from "@/components/app/transitions";
 
 const VERIFY_ICON = { photo: Camera, qr: QrCode, walk: Footprints } as const;
 const VERIFY_LABEL = { photo: "Live photo", qr: "QR scan", walk: "Walk" } as const;
 
-export function QuestCard({ quest, focus }: { quest: Quest; focus?: boolean }) {
+export function QuestCard({ quest, focus, index = 0 }: { quest: Quest; focus?: boolean; index?: number }) {
   const g = GRADES[quest.grade];
   const Icon = VERIFY_ICON[quest.verification];
   return (
     <Link
       href={`/quests/${quest.id}`}
-      className="block outline-none transition-transform focus-visible:scale-[1.01] hover:scale-[1.01]"
+      transitionTypes={FORWARD}
+      className="block outline-none transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1"
     >
-      <ScrollCard glow={`${g.glow},${focus ? 0.6 : 0.22}`} blur={focus ? 20 : 10} bodyClassName="min-h-[132px] gap-2.5 lg:min-h-[164px] lg:p-4">
+      <ScrollCard glow={`${g.glow},${focus ? 0.6 : 0.22}`} blur={focus ? 20 : 10} pulse={focus} index={index} bodyClassName="min-h-[132px] gap-2.5 lg:min-h-[164px] lg:p-4">
         <div className="flex items-center justify-between">
           <GradePill grade={quest.grade} />
           <CategoryTag category={quest.category} />
         </div>
-        <h3 className="font-display text-xl font-extrabold leading-[1.3] text-sumi-900 lg:text-[19px]">
-          {quest.title}
-        </h3>
+        <Morph name={`quest-title-${quest.id}`}>
+          <h3 className="font-display text-xl font-extrabold leading-[1.3] text-sumi-900 lg:text-[19px]">
+            {quest.title}
+          </h3>
+        </Morph>
         <div className="mt-auto flex items-end justify-between">
           <div className="flex flex-col gap-0.5 text-[13px] text-sumi-600">
             <span className="flex items-center gap-1">
@@ -46,10 +50,10 @@ export function QuestCard({ quest, focus }: { quest: Quest; focus?: boolean }) {
 export function BountyCard({ quest }: { quest: Quest }) {
   const g = GRADES[quest.grade];
   return (
-    <Link href={`/quests/${quest.id}`} className="relative block">
-      <span className="absolute -top-2.5 left-[30%] size-1 rounded-full bg-ember-500" />
-      <span className="absolute -top-[18px] left-[62%] size-[3px] rounded-full bg-[#FFB27F]" />
-      <span className="absolute -top-1.5 right-[12%] size-[3px] rounded-full bg-ember-500" />
+    <Link href={`/quests/${quest.id}`} transitionTypes={FORWARD} className="relative block">
+      <span className="ember absolute -top-2.5 left-[30%] size-1 rounded-full bg-ember-500" />
+      <span className="ember absolute -top-[18px] left-[62%] size-[3px] rounded-full bg-[#FFB27F]" style={{ "--i": 1 } as React.CSSProperties} />
+      <span className="ember absolute -top-1.5 right-[12%] size-[3px] rounded-full bg-ember-500" style={{ "--i": 2 } as React.CSSProperties} />
       <ScrollCard glow="255,122,47,0.4" blur={14} burning bodyClassName="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:gap-6 lg:p-5">
         <div className="placeholder-photo hidden h-[150px] items-end rounded p-2 lg:flex">
           <span className="font-mono text-[13px] text-sumi-600">scouting photo · library steps</span>
@@ -65,9 +69,11 @@ export function BountyCard({ quest }: { quest: Quest }) {
               {quest.bounty?.left}
             </span>
           </div>
-          <h3 className="font-display text-xl font-extrabold leading-[1.3] text-sumi-900 lg:text-[28px] lg:leading-tight">
-            {quest.title}
-          </h3>
+          <Morph name={`quest-title-${quest.id}`}>
+            <h3 className="font-display text-xl font-extrabold leading-[1.3] text-sumi-900 lg:text-[28px] lg:leading-tight">
+              {quest.title}
+            </h3>
+          </Morph>
           <p className="hidden text-[15px] leading-[1.6] text-sumi-600 lg:block">{quest.description}</p>
           <div className="mt-auto flex items-end justify-between">
             <div className="flex flex-col gap-1.5 text-[13px] text-sumi-600 lg:flex-row lg:items-center lg:gap-3.5">

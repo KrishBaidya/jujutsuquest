@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { GRADES, type GradeKey } from "@/lib/grades";
 import { categoryOf, type CategoryKey } from "@/lib/mock-data";
+import { CountUp } from "./count-up";
 
 /** Small coloured dot + label, on paper or on night. */
 export function GradePill({
@@ -47,20 +48,34 @@ export function ScrollCard({
   glow,
   blur = 10,
   burning,
+  pulse,
+  index = 0,
   className,
   bodyClassName,
 }: {
   children: React.ReactNode;
-  glow?: string; // "r,g,b"
+  glow?: string; // "r,g,b,a"
   blur?: number;
   burning?: boolean;
+  /** Breathing aura, for the card in focus. */
+  pulse?: boolean;
+  /** Position in a list, staggers the unroll. */
+  index?: number;
   className?: string;
   bodyClassName?: string;
 }) {
   return (
     <div
-      className={cn("relative", className)}
-      style={glow ? { filter: `drop-shadow(0 0 ${blur}px rgba(${glow}))` } : undefined}
+      className={cn("unroll relative", pulse && "aura", className)}
+      style={
+        {
+          "--i": index,
+          ...(glow && {
+            "--glow": glow.split(",").slice(0, 3).join(","),
+            filter: `drop-shadow(0 0 ${blur}px rgba(${glow}))`,
+          }),
+        } as React.CSSProperties
+      }
     >
       <div className={cn("rod", burning && "rod-burn")} />
       <div
@@ -81,7 +96,7 @@ export function ScrollCard({
 
 export function SealedCard({ label = "Reach Semi-Grade 1 to unseal" }: { label?: string }) {
   return (
-    <div className="relative">
+    <div className="unroll relative">
       <div className="rod rod-sealed" />
       <div className="sealed-paper relative flex min-h-[104px] flex-col justify-center gap-1.5 px-[18px] py-4 text-sumi-900">
         <span className="font-display text-[28px] font-extrabold leading-none text-sumi-600">???</span>
@@ -117,6 +132,8 @@ type ActionProps = {
   disabled?: boolean;
   type?: "button" | "submit";
   className?: string;
+  /** Direction of the page transition when `href` is set. */
+  back?: boolean;
 };
 
 /** Primary / secondary action. 48 px minimum height, dips 1 px when pressed. */
@@ -129,19 +146,20 @@ export function Action({
   disabled,
   type = "button",
   className,
+  back,
 }: ActionProps) {
   const cls = cn(
-    "flex min-h-12 items-center justify-center gap-2 rounded-lg font-bold transition-transform active:translate-y-px",
+    "flex min-h-12 items-center justify-center gap-2 rounded-lg font-bold transition-[transform,background-color,box-shadow] active:translate-y-px",
     size === "lg" ? "h-14 text-[17px]" : "h-[52px] text-[15px]",
     variant === "primary"
-      ? "bg-cursed-500 text-white hover:bg-[#6a4ef0]"
+      ? "bg-cursed-500 text-white hover:bg-[#6a4ef0] hover:shadow-[0_6px_24px_rgba(122,92,255,0.45)]"
       : "border border-night-700 text-mist-100 hover:bg-night-800",
     disabled && "pointer-events-none bg-night-700 text-mist-500",
     className,
   );
   if (href && !disabled) {
     return (
-      <Link href={href} className={cls}>
+      <Link href={href} className={cls} transitionTypes={[back ? "nav-back" : "nav-forward"]}>
         {children}
       </Link>
     );
@@ -198,7 +216,7 @@ export function CePill({ value, className }: { value: number | string; className
     >
       <Kanji className="text-[15px] text-cursed-300">呪</Kanji>
       <span className="font-display text-[15px] font-extrabold">
-        {typeof value === "number" ? value.toLocaleString("en-US") : value}
+        {typeof value === "number" ? <CountUp value={value} /> : value}
       </span>
       <span className="text-[13px] text-mist-300">CE</span>
     </span>
@@ -254,11 +272,11 @@ export function Segmented<T extends string>({
       {items.map((it) => {
         const on = it.value === value;
         const cls = cn(
-          "flex h-10 items-center justify-center gap-[5px] rounded-[7px] text-[13px] text-mist-300",
+          "flex h-10 items-center justify-center gap-[5px] rounded-[7px] text-[13px] text-mist-300 transition-colors",
           on && "bg-mist-100 font-bold text-night-900",
         );
         return it.href ? (
-          <Link key={it.value} href={it.href} className={cls} aria-current={on ? "page" : undefined}>
+          <Link key={it.value} href={it.href} scroll={false} className={cls} aria-current={on ? "page" : undefined}>
             {it.label}
           </Link>
         ) : (
@@ -305,7 +323,7 @@ export function CeGauge({
     >
       <div
         className={cn(
-          "h-full rounded-full bg-gradient-to-r from-azure-500 to-cursed-500",
+          "gauge-fill h-full rounded-full bg-gradient-to-r from-azure-500 to-cursed-500",
           tone === "night" && "shadow-[0_0_12px_rgba(122,92,255,0.8)]",
         )}
         style={{ width: `${pct}%` }}

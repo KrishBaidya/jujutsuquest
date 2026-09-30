@@ -1,0 +1,356 @@
+/* Page transitions, ambient motion, scrollers and map styling. */
+
+/* ---------- view transitions ---------- */
+
+::view-transition-old(.nav-forward) {
+  --slide-offset: -48px;
+  animation:
+    150ms ease-in both vt-fade reverse,
+    380ms cubic-bezier(0.22, 0.9, 0.24, 1) both vt-slide reverse;
+}
+::view-transition-new(.nav-forward) {
+  --slide-offset: 48px;
+  animation:
+    220ms ease-out 120ms both vt-fade,
+    380ms cubic-bezier(0.22, 0.9, 0.24, 1) both vt-slide;
+}
+::view-transition-old(.nav-back) {
+  --slide-offset: 48px;
+  animation:
+    150ms ease-in both vt-fade reverse,
+    380ms cubic-bezier(0.22, 0.9, 0.24, 1) both vt-slide reverse;
+}
+::view-transition-new(.nav-back) {
+  --slide-offset: -48px;
+  animation:
+    220ms ease-out 120ms both vt-fade,
+    380ms cubic-bezier(0.22, 0.9, 0.24, 1) both vt-slide;
+}
+::view-transition-old(.ink-fade) {
+  animation: 140ms ease-in both vt-fade reverse;
+}
+::view-transition-new(.ink-fade) {
+  animation:
+    260ms ease-out 100ms both vt-fade,
+    360ms cubic-bezier(0.22, 0.9, 0.24, 1) both vt-rise;
+}
+::view-transition-group(.morph) {
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.22, 0.9, 0.24, 1);
+}
+::view-transition-group(.pinned) {
+  animation: none;
+  z-index: 10;
+}
+
+@keyframes vt-fade {
+  from { opacity: 0; filter: blur(3px); }
+  to { opacity: 1; filter: blur(0); }
+}
+@keyframes vt-slide {
+  from { translate: var(--slide-offset); }
+  to { translate: 0; }
+}
+@keyframes vt-rise {
+  from { translate: 0 10px; }
+  to { translate: 0; }
+}
+
+/* ---------- entrance + ambient motion ---------- */
+
+.reveal {
+  opacity: 0;
+  translate: 0 16px;
+  transition:
+    opacity 520ms cubic-bezier(0.22, 0.9, 0.24, 1),
+    translate 520ms cubic-bezier(0.22, 0.9, 0.24, 1);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.reveal[data-in] {
+  opacity: 1;
+  translate: 0;
+}
+
+.unroll > .paper,
+.unroll > .sealed-paper {
+  animation: unroll 560ms cubic-bezier(0.22, 0.9, 0.24, 1) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+  transform-origin: top;
+}
+@keyframes unroll {
+  from { clip-path: inset(0 0 100% 0); opacity: 0.4; }
+  to { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+
+.aura {
+  animation: aura 2.8s ease-in-out infinite;
+}
+@keyframes aura {
+  0%, 100% { filter: drop-shadow(0 0 14px rgba(var(--glow), 0.45)); }
+  50% { filter: drop-shadow(0 0 26px rgba(var(--glow), 0.8)); }
+}
+
+.ember {
+  animation: ember 1.8s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 420ms);
+}
+@keyframes ember {
+  0%, 100% { translate: 0 0; opacity: 0.9; }
+  50% { translate: 2px -7px; opacity: 0.35; }
+}
+
+.scan-sweep {
+  animation: scan-sweep 2.2s ease-in-out infinite alternate;
+}
+@keyframes scan-sweep {
+  from { top: 14px; }
+  to { top: calc(100% - 16px); }
+}
+
+.bolt {
+  stroke-dasharray: 900;
+  stroke-dashoffset: 900;
+  animation: bolt 420ms cubic-bezier(0.5, 0, 0.75, 0) forwards;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+@keyframes bolt {
+  to { stroke-dashoffset: 0; }
+}
+
+.shake {
+  animation: shake 420ms linear 1;
+}
+@keyframes shake {
+  0%, 100% { translate: 0; }
+  20% { translate: -6px 3px; }
+  40% { translate: 5px -4px; }
+  60% { translate: -4px -2px; }
+  80% { translate: 3px 2px; }
+}
+
+.float {
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -8px; }
+}
+
+.pulse-ring {
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(122, 92, 255, 0.55); }
+  100% { box-shadow: 0 0 0 18px rgba(122, 92, 255, 0); }
+}
+
+.gauge-fill {
+  animation: gauge 900ms cubic-bezier(0.22, 0.9, 0.24, 1) both;
+  transform-origin: left;
+}
+@keyframes gauge {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.sheet-in {
+  animation: sheet-in 420ms cubic-bezier(0.22, 0.9, 0.24, 1) both;
+}
+@keyframes sheet-in {
+  from { translate: 0 28px; opacity: 0; }
+  to { translate: 0; opacity: 1; }
+}
+
+.plinth {
+  animation: plinth 620ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--i, 0) * 120ms);
+  transform-origin: bottom;
+}
+@keyframes plinth {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+.flame {
+  animation: flame 1.4s ease-in-out infinite;
+  transform-origin: bottom;
+}
+@keyframes flame {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  50% { transform: scale(1.14) rotate(3deg); }
+}
+
+/* ---------- scrollers ---------- */
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-color: #3a3264 transparent;
+  scrollbar-width: thin;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #3a3264;
+  border: 2px solid #110d22;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroller {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 28px;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.scroller::-webkit-scrollbar {
+  display: none;
+}
+.scroller > * {
+  scroll-snap-align: start;
+  flex: none;
+}
+.scroller[data-fade="both"] {
+  mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 28px), transparent);
+}
+.scroller[data-fade="right"] {
+  mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
+}
+.scroller[data-fade="left"] {
+  mask-image: linear-gradient(90deg, transparent, #000 28px);
+}
+
+.scroll-y {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+/* ---------- campus map (Leaflet) ---------- */
+
+.leaflet-container.campus-map {
+  background: #0c0919;
+  font-family: inherit;
+}
+/* Standard OSM tiles, recoloured per tile to sit in the night palette. */
+.campus-map .leaflet-tile {
+  filter: invert(1) hue-rotate(205deg) brightness(3.4) contrast(0.9) saturate(0.8);
+}
+.campus-map .leaflet-control-attribution {
+  background: rgba(26, 21, 49, 0.85);
+  color: #a69fc2;
+  font-size: 11px;
+  border-radius: 6px 0 0 0;
+}
+.campus-map .leaflet-control-attribution a {
+  color: #b9a6ff;
+}
+.campus-map .leaflet-control-zoom a {
+  background: #1a1531;
+  color: #eee8fa;
+  border-color: #262046;
+}
+.campus-map .leaflet-control-zoom a:hover {
+  background: #262046;
+}
+.campus-map .leaflet-bar {
+  border: 1px solid #262046;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cmb-pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: max-content;
+  cursor: pointer;
+  transition: scale 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.cmb-pin:hover,
+.cmb-pin[data-active="true"] {
+  scale: 1.12;
+  z-index: 5;
+}
+.cmb-pin-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--c);
+  color: #fff;
+  font: 800 15px/1 var(--font-shippori), serif;
+  box-shadow:
+    0 0 0 3px #0c0919,
+    0 0 14px var(--c);
+}
+.cmb-pin[data-veiled="true"] .cmb-pin-dot {
+  background: #1a1531;
+  color: var(--c);
+  box-shadow:
+    0 0 0 2px var(--c),
+    0 0 0 5px #0c0919;
+}
+.cmb-pin[data-active="true"] .cmb-pin-dot {
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+.cmb-pin-label {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #1a1531;
+  border: 1px solid #262046;
+  color: #eee8fa;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.cmb-you {
+  position: absolute;
+  left: 0;
+  top: 0;
+  translate: -50% -50%;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4c9bff;
+  box-shadow:
+    inset 0 0 0 2px #eee8fa,
+    0 0 0 4px rgba(76, 155, 255, 0.3);
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+.cmb-geofence {
+  animation: geofence 2.6s ease-in-out infinite;
+}
+@keyframes geofence {
+  0%, 100% { stroke-opacity: 1; fill-opacity: 0.18; }
+  50% { stroke-opacity: 0.5; fill-opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+  .reveal { opacity: 1; translate: 0; transition: none; }
+  .unroll > .paper, .unroll > .sealed-paper, .aura, .ember, .scan-sweep, .shake, .float,
+  .pulse-ring, .gauge-fill, .sheet-in, .plinth, .flame, .cmb-geofence, .cmb-you,
+  .cmb-pin[data-active="true"] .cmb-pin-dot {
+    animation: none;
+  }
+  .bolt { animation: none; stroke-dashoffset: 0; }
+  html { scroll-behavior: auto; }
+}

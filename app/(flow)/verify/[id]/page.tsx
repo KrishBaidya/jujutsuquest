@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { questById, type Verification } from "@/lib/mock-data";
 import { VerifyFlow, type Outcome } from "@/components/verify/verify-flow";
+import { Stage } from "@/components/app/shell";
 
 const MODES: Verification[] = ["photo", "qr", "walk"];
 const OUTCOMES: Outcome[] = ["success", "rejected", "flash", "promotion"];
@@ -17,10 +18,12 @@ export default async function VerifyPage({ params, searchParams }: PageProps<"/v
   const outcome = first(sp.outcome) as Outcome;
 
   return (
-    <VerifyFlow
-      quest={{ id: quest.id, title: quest.title, ce: quest.ce, location: quest.location, category: quest.category }}
-      initialMode={MODES.includes(mode) ? mode : quest.verification}
-      forcedOutcome={OUTCOMES.includes(outcome) ? outcome : undefined}
-    />
+    <Stage>
+      <VerifyFlow
+        quest={{ id: quest.id, title: quest.title, ce: quest.ce, location: quest.location, category: quest.category }}
+        initialMode={MODES.includes(mode) ? mode : quest.verification}
+        forcedOutcome={OUTCOMES.includes(outcome) ? outcome : undefined}
+      />
+    </Stage>
   );
 }

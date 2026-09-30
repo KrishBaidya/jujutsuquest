@@ -1,5 +1,4 @@
 import type { GradeKey } from "./grades";
-import { GRADES } from "./grades";
 
 export type CategoryKey = "explore" | "wellness" | "social" | "skill" | "event";
 
@@ -136,33 +135,90 @@ export const questById = (id: string) => quests.find((q) => q.id === id);
 
 // ---------- rank ----------
 
-type LeaderGrade = "special" | "semi1" | "g2";
+export type Period = "week" | "term" | "all";
 
-const leaderRows: [string, string, LeaderGrade, string][] = [
-  ["Diya Kapoor", "Finance", "special", "9,840"],
-  ["Rohan Iyer", "Analytics", "special", "8,215"],
-  ["Meher Sandhu", "HR", "semi1", "6,930"],
-  ["Kabir Das", "Marketing", "semi1", "6,410"],
-  ["Ananya Rao", "Operations", "semi1", "5,870"],
-  ["Ishaan Verma", "Finance", "g2", "4,990"],
-  ["Sara Thomas", "Insurance", "g2", "4,620"],
-  ["Vikram Joshi", "Analytics", "g2", "4,305"],
-  ["Tara Menon", "Marketing", "g2", "4,120"],
-  ["Arjun Bose", "HR", "g2", "3,980"],
+export type Leader = {
+  id: string;
+  name: string;
+  initials: string;
+  dept: string;
+  hostel: string;
+  grade: GradeKey;
+  /** CE by period. */
+  ce: Record<Period, number>;
+  /** Places moved since last week; positive is up. `null` means new entry. */
+  move: number | null;
+  /** Consecutive days with a completed mission. */
+  streak: number;
+  isMe?: boolean;
+};
+
+// name, dept, hostel, grade, term CE, move, streak
+type Row = [string, string, string, GradeKey, number, number | null, number];
+
+const topRows: Row[] = [
+  ["Diya Kapoor", "Finance", "Sukhna", "special", 9840, 0, 41],
+  ["Rohan Iyer", "Analytics", "Zakir", "special", 8215, 1, 27],
+  ["Meher Sandhu", "HR", "Tagore", "semi1", 6930, -1, 19],
+  ["Kabir Das", "Marketing", "Zakir", "semi1", 6410, 2, 12],
+  ["Ananya Rao", "Operations", "Shivalik", "semi1", 5870, 0, 33],
+  ["Ishaan Verma", "Finance", "Nek Chand", "g2", 4990, -2, 8],
+  ["Sara Thomas", "Insurance", "Sukhna", "g2", 4620, 3, 15],
+  ["Vikram Joshi", "Analytics", "Govind", "g2", 4305, 0, 6],
+  ["Tara Menon", "Marketing", "Tagore", "g2", 4120, 1, 22],
+  ["Arjun Bose", "HR", "Zakir", "g2", 3980, -1, 4],
+  ["Nisha Pillai", "Finance", "Shivalik", "g2", 3865, 4, 17],
+  ["Dev Malhotra", "Operations", "Nek Chand", "g2", 3710, null, 3],
+  ["Zoya Khan", "Marketing", "Sukhna", "g2", 3590, -3, 9],
+  ["Aditya Rao", "Analytics", "Govind", "g2", 3475, 0, 11],
+  ["Isha Reddy", "Insurance", "Tagore", "g2", 3320, 2, 5],
+  ["Neel Shah", "Finance", "Zakir", "g3", 3190, -1, 2],
+  ["Maya Pillai", "HR", "Shivalik", "g3", 3045, 1, 14],
+  ["Kabir Nair", "Operations", "Nek Chand", "g3", 2930, 0, 7],
+  ["Riya Sen", "Marketing", "Sukhna", "g3", 2815, 5, 20],
+  ["Yash Gupta", "Analytics", "Govind", "g3", 2700, -2, 1],
 ];
 
-export const leaders = leaderRows.map(([name, dept, g, ce], i) => ({
-  pos: i + 1,
+// The window of ranks around the signed-in student (#45 to #49).
+const nearRows: Row[] = [
+  ["Pooja Bhatt", "Finance", "Tagore", "g3", 1560, -1, 3],
+  ["Karan Mehra", "HR", "Sukhna", "g3", 1540, 2, 6],
+  ["Aarav Mehta", "Marketing", "Zakir", "g3", 1480, 4, 9],
+  ["Simran Kaur", "Operations", "Shivalik", "g3", 1455, -2, 2],
+  ["Rahul Jain", "Analytics", "Govind", "g3", 1410, 0, 5],
+];
+
+/** Campus rank of the first row in the near-me window. */
+export const NEAR_START = 45;
+export const TOP_COUNT = topRows.length;
+
+const toLeader = ([name, dept, hostel, grade, term, move, streak]: Row, i: number): Leader => ({
+  id: name.toLowerCase().replace(/ /g, "-"),
   name,
-  dept,
-  grade: GRADES[g].label,
-  color: GRADES[g].color,
-  ce,
   initials: name
     .split(" ")
     .map((w) => w[0])
     .join(""),
-}));
+  dept,
+  hostel,
+  grade,
+  // Weekly and all-time figures are derived so the three periods rank differently.
+  ce: {
+    term,
+    week: Math.round(term * (0.05 + ((i * 37) % 11) / 100)),
+    all: Math.round(term * (1.9 + ((i * 53) % 9) / 10)),
+  },
+  move,
+  streak,
+  isMe: name === "Aarav Mehta",
+});
+
+export const leaders: Leader[] = [
+  ...topRows.map(toLeader),
+  ...nearRows.map((r, i) => toLeader(r, topRows.length + i)),
+];
+
+export const departments = ["Finance", "Analytics", "Marketing", "Operations", "HR", "Insurance"];
 
 export const specialSeats = [
   { seat: 1, name: "Diya Kapoor", dept: "Finance", ce: "9,840" },
@@ -186,6 +242,77 @@ export const exchangeDepts = deptRows.map(([name, ce], i) => ({
   lead: i === 0,
 }));
 
+// ---------- hostels ----------
+
+export type Hostel = {
+  id: string;
+  name: string;
+  crest: string;
+  color: string;
+  members: number;
+  ce: number;
+  wins: number;
+  losses: number;
+  /** Positive = winning streak, negative = losing streak. */
+  streak: number;
+};
+
+// Placeholder hostel names and figures; replace with the real roster.
+export const hostels: Hostel[] = [
+  { id: "sukhna", name: "Sukhna", crest: "鳳", color: "#E0202A", members: 212, ce: 96420, wins: 5, losses: 0, streak: 5 },
+  { id: "zakir", name: "Zakir", crest: "龍", color: "#7A5CFF", members: 198, ce: 91870, wins: 4, losses: 1, streak: 3 },
+  { id: "tagore", name: "Tagore", crest: "虎", color: "#D9A441", members: 205, ce: 84310, wins: 3, losses: 2, streak: 1 },
+  { id: "shivalik", name: "Shivalik", crest: "狼", color: "#4C9BFF", members: 187, ce: 79640, wins: 3, losses: 2, streak: -1 },
+  { id: "nek-chand", name: "Nek Chand", crest: "鷹", color: "#2FB38A", members: 176, ce: 66280, wins: 2, losses: 3, streak: 2 },
+  { id: "govind", name: "Govind", crest: "熊", color: "#D6409F", members: 190, ce: 61950, wins: 2, losses: 3, streak: -2 },
+  { id: "le-corbusier", name: "Le Corbusier", crest: "鹿", color: "#FF7A2F", members: 164, ce: 48720, wins: 1, losses: 4, streak: -3 },
+  { id: "aravali", name: "Aravali", crest: "蛇", color: "#6CB4FF", members: 158, ce: 41090, wins: 0, losses: 5, streak: -5 },
+];
+
+export const hostelById = (id: string) => hostels.find((h) => h.id === id)!;
+
+export const hostelDuel = {
+  week: 6,
+  endsIn: "2d 6h",
+  home: {
+    id: "zakir",
+    ce: 12840,
+    top: [
+      { name: "Rohan Iyer", ce: 1120, isMe: false },
+      { name: "Kabir Das", ce: 940, isMe: false },
+      { name: "Aarav Mehta", ce: 410, isMe: true },
+    ],
+  },
+  away: {
+    id: "sukhna",
+    ce: 11910,
+    top: [
+      { name: "Diya Kapoor", ce: 1305, isMe: false },
+      { name: "Sara Thomas", ce: 760, isMe: false },
+      { name: "Riya Sen", ce: 655, isMe: false },
+    ],
+  },
+  stake: "+150 CE to every member of the winning hostel",
+};
+
+export type Fixture = {
+  week: number;
+  home: string;
+  away: string;
+  homeCe?: number;
+  awayCe?: number;
+  live: boolean;
+};
+
+export const hostelFixtures: Fixture[] = [
+  { week: 6, home: "tagore", away: "shivalik", homeCe: 10220, awayCe: 10980, live: true },
+  { week: 6, home: "nek-chand", away: "govind", homeCe: 8410, awayCe: 7930, live: true },
+  { week: 6, home: "le-corbusier", away: "aravali", homeCe: 6120, awayCe: 5540, live: true },
+  { week: 7, home: "zakir", away: "tagore", live: false },
+  { week: 7, home: "sukhna", away: "shivalik", live: false },
+  { week: 8, home: "zakir", away: "nek-chand", live: false },
+];
+
 // ---------- profile ----------
 
 export const me = {
@@ -200,6 +327,10 @@ export const me = {
   endorsements: 14,
   campusPos: 47,
   campusSize: "1,284",
+  hostel: "zakir",
+  streak: 9,
+  weekCe: 410,
+  weekMove: 4,
   reviewQueue: 6,
 };
 
@@ -207,7 +338,12 @@ export const badges = [
   { k: "探", label: "First scout", locked: false },
   { k: "癒", label: "10 km walked", locked: false },
   { k: "縁", label: "Squad of 5", locked: false },
-  { k: "", label: "Night owl", locked: true },
+  { k: "夜", label: "Night owl", locked: true },
+  { k: "審", label: "Fair judge", locked: true },
+  { k: "祭", label: "Festival run", locked: true },
+  { k: "技", label: "Sharp pitch", locked: true },
+  { k: "閃", label: "Black Flash", locked: true },
+  { k: "特", label: "Seat holder", locked: true },
 ];
 
 export const fragments = Array.from({ length: 20 }, (_, i) => ({
@@ -243,20 +379,11 @@ export const missionsActive = [
 export const missionsPending = [
   { title: "Find the hidden mural", note: "With a senior sorcerer · usually under 2 h" },
 ];
-export const missionsDone = [{ title: "Tea with the chess club", ce: "+80 CE" }];
-
-// ---------- map ----------
-
-export const veilPins = [
-  { grade: "g2" as GradeKey, x: 63, y: 36 },
-  { grade: "g3" as GradeKey, x: 11, y: 44 },
-  { grade: "g1" as GradeKey, x: 77, y: 27 },
-];
-
-export const locations = [
-  { slug: "fountain-plaza", name: "Fountain plaza", image: "/locations/fountain-plaza.jpg", note: "The dry fountain. A curse gathers under the red sky.", grade: "g2" as GradeKey, distance: "180 m" },
-  { slug: "fire-station", name: "Fire station", image: "/locations/fire-station.jpg", note: "The old engine still idles in the dark bay.", grade: "semi1" as GradeKey, distance: "420 m" },
-  { slug: "night-cafe", name: "Night café", image: "/locations/night-cafe.jpg", note: "Empty stools and long shadows. Quiet, for now.", grade: "g4" as GradeKey, distance: "90 m" },
+export const missionsDone = [
+  { title: "Tea with the chess club", ce: "+80 CE", when: "Mon" },
+  { title: "Find the hidden mural", ce: "+120 CE", when: "Last Fri" },
+  { title: "Wellness walk, fountain", ce: "+40 CE", when: "Last Thu" },
+  { title: "Library orientation quiz", ce: "+60 CE", when: "Last Tue" },
 ];
 
 export const schools = ["Finance", "Analytics", "Marketing", "Operations", "HR", "Insurance"];
