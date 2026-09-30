@@ -5,11 +5,13 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { schools } from "@/lib/mock-data";
 import { Action, Kanji } from "@/components/app/primitives";
 import { GRADES } from "@/lib/grades";
+import { Stage } from "@/components/app/shell";
+import { PageTransition } from "@/components/app/transitions";
 import { cn } from "@/lib/utils";
 
 const UID_PATTERN = /^[A-Z]{2,4}-\d{4}-\d{3,5}$/;
 const field =
-  "h-[52px] w-full rounded-lg border border-night-700 bg-night-800 px-4 text-base text-mist-100 outline-none placeholder:text-mist-500 focus-visible:border-cursed-500 focus-visible:ring-[3px] focus-visible:ring-cursed-500/20";
+  "h-[52px] w-full rounded-lg border border-night-700 bg-night-800 lg:bg-night-900 px-4 text-base text-mist-100 outline-none placeholder:text-mist-500 focus-visible:border-cursed-500 focus-visible:ring-[3px] focus-visible:ring-cursed-500/20";
 
 export default function OnboardingPage() {
   const [step, setStep] = useState<"form" | "card">("form");
@@ -24,7 +26,8 @@ export default function OnboardingPage() {
   if (step === "card") {
     const g = GRADES.g4;
     return (
-      <div className="flex flex-1 flex-col items-center gap-5 bg-night-950 px-7 pb-8 pt-8">
+      <Stage className="lg:bg-night-950">
+      <div className="rise-in flex flex-1 flex-col items-center gap-5 bg-night-950 px-7 pb-8 pt-8">
         <Kanji className="brush mt-2 text-[96px] leading-none">呪</Kanji>
         <div className="flex flex-col gap-1.5 text-center">
           <h1 className="font-display text-[28px] font-extrabold leading-[1.2]">Welcome, sorcerer.</h1>
@@ -78,30 +81,32 @@ export default function OnboardingPage() {
           See the board
         </Action>
       </div>
+      </Stage>
     );
   }
 
   return (
+    <PageTransition>
     <form
       noValidate
-      className="bg-grid-night flex flex-1 flex-col gap-7 px-7 pb-8 pt-8"
+      className="bg-grid-night flex flex-1 flex-col gap-7 px-7 pb-8 pt-8 lg:mx-auto lg:grid lg:w-full lg:max-w-[1000px] lg:flex-none lg:grid-cols-2 lg:items-center lg:gap-x-20 lg:gap-y-8 lg:bg-none lg:px-8 lg:py-24"
       onSubmit={(e) => {
         e.preventDefault();
         setTouched(true);
         if (valid) setStep("card");
       }}
     >
-      <div className="relative flex h-[150px] items-center">
+      <div className="relative flex h-[150px] items-center lg:col-start-1 lg:row-start-1 lg:h-[220px]">
         <div className="absolute -left-5 top-0 h-40 w-[180px] bg-[radial-gradient(circle,rgba(122,92,255,0.35),transparent_65%)]" />
-        <Kanji className="brush relative text-[132px] leading-none">呪</Kanji>
+        <Kanji className="brush float relative text-[132px] leading-none lg:text-[220px]">呪</Kanji>
       </div>
-      <div className="flex flex-col gap-2">
-        <h1 className="font-display text-[32px] font-extrabold leading-[1.2]">Enter the domain.</h1>
+      <div className="flex flex-col gap-2 lg:col-start-1 lg:row-start-2 lg:self-start">
+        <h1 className="font-display text-[32px] font-extrabold leading-[1.2] lg:text-[56px] lg:leading-[1.1]">Enter the domain.</h1>
         <p className="text-[15px] leading-[1.6] text-mist-300 [text-wrap:pretty]">
           Campus life, turned into missions. Three details and you&apos;re in. No password needed.
         </p>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 lg:col-start-2 lg:row-start-1 lg:self-end lg:rounded-t-2xl lg:border lg:border-b-0 lg:border-night-700 lg:bg-night-800 lg:p-8 lg:pb-4">
         <label className="flex flex-col gap-1.5">
           <span className="text-[13px] text-mist-300">Your name</span>
           <input
@@ -145,7 +150,7 @@ export default function OnboardingPage() {
           </div>
         </label>
       </div>
-      <div className="mt-auto flex flex-col gap-3">
+      <div className="mt-auto flex flex-col gap-3 lg:col-start-2 lg:row-start-2 lg:-mt-8 lg:self-start lg:rounded-b-2xl lg:border lg:border-t-0 lg:border-night-700 lg:bg-night-800 lg:p-8 lg:pt-4">
         <Action type="submit" disabled={touched && !valid}>
           Enter the domain
           <ArrowRight className="size-5" aria-hidden />
@@ -153,5 +158,6 @@ export default function OnboardingPage() {
         <p className="text-center text-[13px] text-mist-500">Your student UID is your key to the board.</p>
       </div>
     </form>
+    </PageTransition>
   );
 }

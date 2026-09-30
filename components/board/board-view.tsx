@@ -1,14 +1,20 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { QrCode, SlidersHorizontal } from "lucide-react";
+import { MapPin, QrCode, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GRADES, GRADE_ORDER, type GradeKey } from "@/lib/grades";
 import { CATEGORIES, me, quests, type CategoryKey } from "@/lib/mock-data";
 import { CePill, Chip, Kanji, PageHeader, SealedCard } from "@/components/app/primitives";
 import { Page } from "@/components/app/shell";
+import { Scroller } from "@/components/app/scroller";
+import { FORWARD } from "@/components/app/transitions";
+import { campusPlaces } from "@/lib/campus";
 import { BountyCard, QuestCard } from "./quest-card";
+
+const sites = campusPlaces.filter((p) => p.image);
 
 const open = quests.filter((q) => !q.sealedUntil);
 const bounty = open.find((q) => q.bounty);
@@ -36,7 +42,7 @@ export function BoardView() {
     <Page>
       <div className="lg:grid lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-12">
         {/* Desktop sidebar */}
-        <aside className="hidden flex-col gap-7 lg:flex">
+        <aside className="hidden flex-col gap-7 lg:sticky lg:top-[104px] lg:flex lg:self-start">
           <div className="flex flex-col gap-1.5">
             <Kanji className="brush text-5xl leading-none">命</Kanji>
             <h1 className="font-display text-[28px] font-extrabold">Mission board</h1>
@@ -85,7 +91,7 @@ export function BoardView() {
               subtitle={`${open.length} missions near you`}
               right={<CePill value={me.ce} className="h-[34px]" />}
             />
-            <div className="flex gap-2 overflow-x-auto px-5 py-4 [scrollbar-width:none]">
+            <Scroller label="Filter missions" arrows={false} className="py-4" trackClassName="gap-2 px-5">
               <span className="flex h-9 flex-none items-center gap-1.5 rounded-full border border-night-700 bg-night-800 px-3 text-[13px] text-mist-300">
                 <SlidersHorizontal className="size-4" aria-hidden />
                 {grades.size ? `${grades.size} grade${grades.size > 1 ? "s" : ""}` : "Any grade"}
@@ -99,11 +105,51 @@ export function BoardView() {
                   {c.label}
                 </Chip>
               ))}
-            </div>
+            </Scroller>
           </div>
 
           <div className="flex flex-col gap-[26px] px-[26px] pb-32 pt-1.5 lg:gap-8 lg:px-0 lg:pb-0 lg:pt-0">
             {bounty && category === "all" && !grades.size && <BountyCard quest={bounty} />}
+            {category === "all" && !grades.size && (
+              <section className="flex min-w-0 flex-col gap-3">
+                <div className="flex items-baseline justify-between">
+                  <h2 className="text-[17px] font-bold">Sites near you</h2>
+                  <Link href="/locations" transitionTypes={FORWARD} className="text-[13px] text-cursed-300 hover:text-mist-100">
+                    See all
+                  </Link>
+                </div>
+                <Scroller label="Sites near you" className="-mx-[26px] lg:mx-0" trackClassName="px-[26px] lg:px-0">
+                  {sites.map((s) => (
+                    <Link
+                      key={s.id}
+                      href={`/map?place=${s.id}`}
+                      transitionTypes={FORWARD}
+                      className="group relative h-[132px] w-[220px] overflow-hidden rounded border border-night-700 lg:h-[150px] lg:w-[264px]"
+                    >
+                      <Image
+                        src={s.image!}
+                        alt=""
+                        fill
+                        sizes="264px"
+                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <span className="absolute inset-0 bg-gradient-to-t from-night-950 via-night-950/20 to-transparent" />
+                      <span className="absolute inset-x-3 bottom-2.5 flex items-end justify-between gap-2">
+                        <span className="font-display text-[17px] font-extrabold leading-tight">{s.name}</span>
+                        <span className="flex flex-none items-center gap-1 text-[13px] text-mist-300">
+                          <MapPin className="size-3.5" aria-hidden />
+                          {s.distance}
+                        </span>
+                      </span>
+                      <span
+                        className="absolute left-2.5 top-2.5 size-2.5 rounded-full shadow-[0_0_0_2px_#0C0919]"
+                        style={{ background: GRADES[s.grade].color }}
+                      />
+                    </Link>
+                  ))}
+                </Scroller>
+              </section>
+            )}
             {visible.length === 0 ? (
               <p className="py-10 text-center text-[15px] text-mist-300">
                 No open missions match. Try another category.
@@ -111,7 +157,7 @@ export function BoardView() {
             ) : (
               <div className="grid grid-cols-1 gap-[26px] lg:grid-cols-3 lg:gap-x-7 lg:gap-y-9">
                 {visible.map((q, i) => (
-                  <QuestCard key={q.id} quest={q} focus={i === 0} />
+                  <QuestCard key={q.id} quest={q} focus={i === 0} index={i} />
                 ))}
                 {category === "all" && !grades.size && <SealedCard />}
               </div>

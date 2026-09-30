@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Camera, Footprints, QrCode, X } from "lucide-react";
 import { CATEGORIES, type CategoryKey, type Verification } from "@/lib/mock-data";
 import { Action, Chip, Kanji, Segmented } from "@/components/app/primitives";
+import { Stage } from "@/components/app/shell";
+import { BACK } from "@/components/app/transitions";
 import { cn } from "@/lib/utils";
 
 const inputCls =
@@ -28,30 +30,32 @@ export default function CreateQuestPage() {
 
   if (sent) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8 pb-16 text-center">
+      <Stage width="form">
+      <div className="rise-in flex flex-1 flex-col items-center justify-center gap-3 px-8 pb-16 text-center">
         <Kanji className="text-6xl text-cursed-300">審</Kanji>
         <h1 className="font-display text-2xl font-extrabold">Sent for review</h1>
         <p className="text-[15px] leading-[1.6] text-mist-300">
           &ldquo;{title}&rdquo; goes to a senior sorcerer as a Grade {sent} quest.
         </p>
-        <Action href="/board" size="md" className="mt-4 w-full">
+        <Action href="/board" back size="md" className="mt-4 w-full max-w-[320px]">
           Back to board
         </Action>
       </div>
+      </Stage>
     );
   }
 
   return (
-    <>
-      <header className="flex items-center gap-2 px-4 pt-[calc(env(safe-area-inset-top)+16px)]">
-        <Link href="/board" aria-label="Close" className="flex size-11 items-center justify-center">
+    <Stage width="form">
+      <header className="flex items-center gap-2 px-4 pt-[calc(env(safe-area-inset-top)+16px)] lg:px-6 lg:pt-6">
+        <Link href="/board" transitionTypes={BACK} aria-label="Close" className="flex size-11 items-center justify-center rounded-full hover:bg-night-800">
           <X className="size-[22px]" />
         </Link>
         <h1 className="font-display text-[22px] font-extrabold">Create quest</h1>
       </header>
 
       <form
-        className="flex flex-1 flex-col gap-4 px-5 py-3.5"
+        className="flex flex-1 flex-col gap-4 px-5 py-3.5 lg:gap-5 lg:px-8 lg:pb-8"
         onSubmit={(e) => {
           e.preventDefault();
           if (canSubmit) setSuggestOpen(true);
@@ -121,14 +125,14 @@ export default function CreateQuestPage() {
 
       {suggestOpen && (
         <>
-          <div className="fixed inset-0 z-30 bg-night-950/55" aria-hidden />
+          <div className="fixed inset-0 z-[1200] bg-night-950/55 lg:bg-night-950/70 lg:backdrop-blur-sm" aria-hidden />
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="jev-title"
-            className="fixed inset-x-0 bottom-0 z-40 mx-auto flex w-full max-w-[430px] flex-col gap-4 rounded-t-[20px] border-t border-night-600 bg-night-800 px-[22px] pb-[34px] pt-2.5"
+            className="sheet-in fixed inset-x-0 bottom-0 z-[1210] mx-auto flex w-full max-w-[430px] flex-col gap-4 rounded-t-[20px] border-t border-night-600 bg-night-800 px-[22px] pb-[34px] pt-2.5 lg:bottom-auto lg:top-1/2 lg:max-w-[460px] lg:-translate-y-1/2 lg:rounded-2xl lg:border lg:p-7"
           >
-            <span className="h-1 w-10 self-center rounded-sm bg-night-700" />
+            <span className="h-1 w-10 self-center rounded-sm bg-night-700 lg:hidden" />
             <div className="flex items-center gap-3">
               <span className="flex size-11 items-center justify-center rounded-full border border-cursed-500 bg-night-700 font-bold text-cursed-300">
                 Jev
@@ -159,6 +163,6 @@ export default function CreateQuestPage() {
           </div>
         </>
       )}
-    </>
+    </Stage>
   );
 }
